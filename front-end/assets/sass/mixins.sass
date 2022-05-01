@@ -1,0 +1,15 @@
+@mixin uppercase
+    text-transform: uppercase
+    
+@mixin flexify
+    display: flex
+    justify-content: center
+    align-items: center
+
+@mixin flexify-col
+    @include flexify
+    flex-flow: column wrap
+
+@mixin flexify-row
+    @include flexify
+    flex-flow: row wrap    
