@@ -60,5 +60,5 @@ export default {}
             margin: 10px 0
         .button
             font-size: 0.5rem
-            margin-top: 12px
+            margin-top: 10px
 </style>

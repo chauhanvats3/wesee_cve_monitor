@@ -21,7 +21,7 @@
 
 <script>
 export default {
-  name: 'IndexPage',
+  name: 'Home',
 }
 </script>
 
