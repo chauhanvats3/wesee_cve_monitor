@@ -3,11 +3,12 @@
     <Nav />
     <Breadcrumb />
     <div class="content">
-      <DomainCard domain="vatsal.dev" verified="false" />
-      <DomainCard domain="pwd.dev" verified="true" />
-      <DomainCard domain="laura.lassan" verified="false" />
-      <DomainCard domain="one.plus" verified="true" />
-      <DomainCard domain="john.cena" verified="true" />
+      <DomainCard
+        v-for="(domainInfo, index) in allDomains"
+        :key="index"
+        :domain="domainInfo.name"
+        :verified="domainInfo.verified"
+      />
     </div>
     <div class="newDomain">
       <NewDomainCard />
@@ -16,9 +17,17 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import DomainCard from '../components/DomainCard.vue'
 import NewDomainCard from '~/components/NewDomainCard.vue'
-export default { components: { DomainCard, NewDomainCard } }
+export default {
+  components: { DomainCard, NewDomainCard, DomainCard },
+  computed: {
+    allDomains: function () {
+      return this.$store.getters.getAllDomains
+    },
+  },
+}
 </script>
 
 <style lang="sass" scoped>

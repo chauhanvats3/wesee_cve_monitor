@@ -11,12 +11,17 @@
       <div class="close" @click.stop="closeOverlay">
         <p>X</p>
       </div>
-      <input type="text" class="txtbx" placeholder="https://" />
+      <input
+        type="text"
+        class="txtbx"
+        placeholder="https://"
+        ref="domainInput"
+      />
       <div class="enum">
         <input type="checkbox" class="chckbx" ref="checkbox" />
         <p @click="checkBoxClick">Subdomain Enumeration</p>
       </div>
-      <div class="add" @click.stop="">
+      <div class="add" @click.stop="addNewDomain">
         <p>Add Domain</p>
       </div>
     </div>
@@ -24,16 +29,24 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   methods: {
+    ...mapMutations(['addDomain']),
     openOverlay() {
       this.$refs.overlay.classList.add('show')
     },
     closeOverlay() {
       this.$refs.overlay.classList.remove('show')
+      this.$refs.domainInput.value = ''
     },
     checkBoxClick() {
       this.$refs.checkbox.checked = !this.$refs.checkbox.checked
+    },
+    addNewDomain() {
+      this.addDomain(this.$refs.domainInput.value)
+      this.$refs.domainInput.value = ''
     },
   },
 }

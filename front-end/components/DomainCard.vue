@@ -2,7 +2,7 @@
   <div class="domain-card">
     <div
       class="overlay"
-      v-bind:class="{ verified: verified == 'true' }"
+      v-bind:class="{ verified: verified == true }"
       @mouseleave="resetDeleteClicked"
     >
       <div class="top-row">
@@ -11,20 +11,20 @@
         </div>
         <div
           class="verify-btn"
-          v-if="verified == 'false'"
+          v-if="verified == false"
           @click.stop="openVerifyInstructions"
         >
           <p>how to verify?</p>
         </div>
       </div>
 
-      <div class="content" v-if="verified == 'true'">
+      <div class="content" v-if="verified == true">
         <p>Number Of Subdomains : 5</p>
         <p>No Of Techs Found : 55</p>
         <p>No Of CVEs Discovered: 555</p>
       </div>
 
-      <div class="cta" v-if="verified == 'true'" ref="cta">
+      <div class="cta" v-if="verified == true" ref="cta">
         <div class="btn verified">Verified</div>
         <div class="btn dashboard">
           <NuxtLink :to="'/dashboard/' + domain">Dashboard</NuxtLink>
@@ -34,7 +34,7 @@
       </div>
     </div>
 
-    <div class="verify-overlay" v-if="verified == 'false'" ref="verifyOverlay">
+    <div class="verify-overlay" v-if="verified == false" ref="verifyOverlay">
       <div class="close" @click.stop="closeVerifyInstructions">
         <p>X</p>
       </div>
