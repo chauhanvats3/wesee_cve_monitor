@@ -1,6 +1,10 @@
 <template>
   <div class="domain-card">
-    <div class="overlay" v-bind:class="{ verified: verified == 'true' }">
+    <div
+      class="overlay"
+      v-bind:class="{ verified: verified == 'true' }"
+      @mouseleave="resetDeleteClicked"
+    >
       <div class="top-row">
         <div class="domain">
           <p>{{ domain }}</p>
@@ -16,21 +20,22 @@
 
       <div class="content" v-if="verified == 'true'">
         <p>Number Of Subdomains : 5</p>
-        <p>No Of Techs : 55</p>
-        <p>No Of CVEs : 555</p>
+        <p>No Of Techs Found : 55</p>
+        <p>No Of CVEs Discovered: 555</p>
       </div>
 
-      <div class="cta" v-if="verified == 'true'">
+      <div class="cta" v-if="verified == 'true'" ref="cta">
         <div class="btn verified">Verified</div>
         <div class="btn dashboard">
-          <NuxtLink to="/dashboard">Dashboard</NuxtLink>
+          <NuxtLink :to="'/dashboard/' + domain">Dashboard</NuxtLink>
         </div>
-        <div class="btn delete">Delete</div>
+        <div class="btn delete" @click="deleteClicked">Delete</div>
+        <p>I want to DELETE this domain</p>
       </div>
     </div>
 
     <div class="verify-overlay" v-if="verified == 'false'" ref="verifyOverlay">
-      <div class="close" @click.close="closeVerifyInstructions">
+      <div class="close" @click.stop="closeVerifyInstructions">
         <p>X</p>
       </div>
       <div class="content">
@@ -39,14 +44,14 @@
           2. Copy the text record below into the DNS configuration for
           <span>{{ domain }}</span>
         </p>
-        <p>3. Press “verify now” after a while</p>
+        <p>3. Press “verify" after a while</p>
       </div>
       <div class="bottom-row">
         <div class="verification-code">
           <p>we-see-verification.{{ domain }}=as21db6537r2a</p>
         </div>
         <div class="btn verify-now">
-          <p>Verify Now</p>
+          <p>verify</p>
         </div>
       </div>
     </div>
@@ -56,12 +61,37 @@
 <script>
 export default {
   props: ['domain', 'verified'],
+  data() {
+    return {
+      deleteDomain: false,
+    }
+  },
   methods: {
     openVerifyInstructions() {
       this.$refs.verifyOverlay.classList.toggle('show')
     },
     closeVerifyInstructions() {
       this.$refs.verifyOverlay.classList.toggle('show')
+    },
+    deleteClicked() {
+      this.$refs.cta.children[0].classList.add('hide')
+      this.$refs.cta.children[1].classList.add('hide')
+      this.$refs.cta.children[2].innerText = 'Yes'
+      this.$refs.cta.children[2].style.marginRight = '15px'
+      this.$refs.cta.classList.add('deleteClicked')
+      this.$refs.cta.children[3].classList.add('show')
+    },
+    resetDeleteClicked() {
+      if (!this.$refs.cta) return
+
+      setTimeout(() => {
+        this.$refs.cta.children[0].classList.remove('hide')
+        this.$refs.cta.children[1].classList.remove('hide')
+        this.$refs.cta.children[2].innerText = 'Delete'
+        this.$refs.cta.children[2].style.marginRight = '0px'
+        this.$refs.cta.classList.remove('deleteClicked')
+        this.$refs.cta.children[3].classList.remove('show')
+      }, 500)
     },
   },
 }
@@ -123,7 +153,7 @@ $top-row-height : 50px
                     font-size: 0.8rem
 
             .verify-btn
-                background: $red
+                background: $main-color
                 border-radius: 15px
                 height: $top-row-height
                 @include flexify
@@ -150,6 +180,16 @@ $top-row-height : 50px
             flex-wrap: wrap
             justify-content: space-around
             width: 100%
+            padding: 0 15px
+
+            &.deleteClicked
+              justify-content: flex-start
+            p
+              display: none
+              margin-bottom: 15px
+              transition: all 0.4s ease-in-out
+            p.show
+              display: flex
             .btn
                 background: blue
                 border-radius: 7px
@@ -173,6 +213,10 @@ $top-row-height : 50px
                 &.delete:hover,&.dashboard:hover
                   box-shadow: 0 1px 1px rgba(0,0,0,0.11), 0 2px 2px rgba(0,0,0,0.11), 0 4px 4px rgba(0,0,0,0.11), 0 6px 8px rgba(0,0,0,0.11),0 8px 16px rgba(0,0,0,0.11)
 
+                &.hide
+                  opacity: 0
+                  position: absolute
+                  right: 200%
 
 
     .verify-overlay
@@ -213,10 +257,10 @@ $top-row-height : 50px
                 font-weight: bold
         .bottom-row
             @include flexify-row
-            justify-content: space-around
+            justify-content: space-evenly
             width: 100%
             .verification-code
-              max-width: 70%
+              max-width: 80%
               height: 100%
               overflow-x: scroll
               font-size: 0.75rem
@@ -234,6 +278,7 @@ $top-row-height : 50px
               background: $main-color
               color: white
               padding: 15px
+              margin-left: 15px
               border-radius: 10px
               cursor: pointer
 

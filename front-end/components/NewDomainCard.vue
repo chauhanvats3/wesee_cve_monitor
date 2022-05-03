@@ -13,8 +13,8 @@
       </div>
       <input type="text" class="txtbx" placeholder="https://" />
       <div class="enum">
-        <input type="checkbox" class="chckbx" />
-        <p>Subdomain Enumeration</p>
+        <input type="checkbox" class="chckbx" ref="checkbox" />
+        <p @click="checkBoxClick">Subdomain Enumeration</p>
       </div>
       <div class="add" @click.stop="">
         <p>Add Domain</p>
@@ -31,6 +31,9 @@ export default {
     },
     closeOverlay() {
       this.$refs.overlay.classList.remove('show')
+    },
+    checkBoxClick() {
+      this.$refs.checkbox.checked = !this.$refs.checkbox.checked
     },
   },
 }
@@ -96,8 +99,8 @@ export default {
             position: absolute
             top: 0
             right: 0
-            background: $main-color
-            color: white
+            background: $black
+            color: $main-color
             margin: 10px
             padding: 10px
             border-radius: 5px
@@ -116,7 +119,9 @@ export default {
             width: 100%
             margin: 10px
             .chckbx
-                margin: 5px 20px
+                margin: 5px 10px
+                width: 20px
+                height: 20px
             p
                 font-size: 0.8rem
 

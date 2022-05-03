@@ -3,11 +3,11 @@
     <Nav />
     <Breadcrumb />
     <div class="content">
-      <DomainCard domain="https://vatsal.dev" verified="false" />
-      <DomainCard domain="https://pwd.dev" verified="true" />
-      <DomainCard domain="https://laura.lassan" verified="false" />
-      <DomainCard domain="https://one.plus" verified="true" />
-      <DomainCard domain="https://john.cena" verified="true" />
+      <DomainCard domain="vatsal.dev" verified="false" />
+      <DomainCard domain="pwd.dev" verified="true" />
+      <DomainCard domain="laura.lassan" verified="false" />
+      <DomainCard domain="one.plus" verified="true" />
+      <DomainCard domain="john.cena" verified="true" />
     </div>
     <div class="newDomain">
       <NewDomainCard />
