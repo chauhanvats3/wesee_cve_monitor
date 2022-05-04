@@ -102,8 +102,8 @@ $top-row-height : 50px
 
 .domain-card
     width: 550px
-    height: 300px
-    background: url(https://picsum.photos/550/300) no-repeat
+    height: 350px
+    background: url(https://picsum.photos/550/350) no-repeat
     border-radius: 15px
     margin: 50px 20px
     position: relative

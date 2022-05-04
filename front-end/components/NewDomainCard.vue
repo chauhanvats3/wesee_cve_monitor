@@ -16,6 +16,7 @@
         class="txtbx"
         placeholder="https://"
         ref="domainInput"
+        tabindex="-1"
       />
       <div class="enum">
         <input type="checkbox" class="chckbx" ref="checkbox" />
@@ -107,6 +108,7 @@ export default {
         cursor: default
         opacity: 0
         transition: all 0.4s ease-in-out
+        transform: scale(0)
 
         .close
             position: absolute
@@ -153,4 +155,5 @@ export default {
         &.show
             opacity: 1
             top: 0
+            transform: scale(1)
 </style>

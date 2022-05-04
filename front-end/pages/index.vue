@@ -32,6 +32,7 @@ export default {
   height: 100vh
   position: relative
   flex-wrap: nowrap
+  padding-top: calc(80px + 5vh)
 
   .bg
     position: absolute
@@ -48,7 +49,6 @@ export default {
   .intro
     align-self: flex-start
     margin: 20px 50px
-    margin-top: calc(80px + 10vh)
     color: white
 
     .main
@@ -133,7 +133,6 @@ export default {
 @media screen and (max-width: $small)
   .index
     .intro
-      margin-top: calc(80px + 20vh)
       .main
         font-size: 130%
 
