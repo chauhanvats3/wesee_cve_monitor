@@ -11,27 +11,11 @@
 <script>
 export default {
   props: ['tech'],
-  methods: {
-    generatePalette() {
-      let color = this.tech.color
-      let rgb = this.$hexToRgb(color)
-      let hsl = this.$rgbToHsl(rgb)
-      let palette = []
-      if (hsl[1] >= hsl[2]) {
-        //If Color is Dark
-        for (let i = 0; i < 3; i++)
-          palette[i] = [hsl[0], hsl[1], hsl[2] + i * 15, hsl[3]]
-      } else {
-        //If Color is light
-        for (let i = 0, j = 2; i < 3; i++, j--)
-          palette[j] = [hsl[0], hsl[1], hsl[2] - i * 15, hsl[3]]
-      }
-      return palette
-    },
-  },
+  methods: {},
   computed: {
     bgColors() {
-      let hslValues = this.generatePalette()
+      let color = this.tech.color
+      let hslValues = this.$generatePalette(color)
       let bg = []
       for (let i = 0; i < hslValues.length; i++) {
         bg[

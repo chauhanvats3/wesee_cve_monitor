@@ -51,10 +51,28 @@ export default (context, inject) => {
     return [h, s, l, a]
   }
 
+  const generatePalette = (color) => {
+    let rgb = hexToRgb(color)
+    let hsl = rgbToHsl(rgb)
+    let palette = []
+    if (hsl[1] >= hsl[2]) {
+      //If Color is Dark
+      for (let i = 0; i < 3; i++)
+        palette[i] = [hsl[0], hsl[1], hsl[2] + i * 15, hsl[3]]
+    } else {
+      //If Color is light
+      for (let i = 0, j = 2; i < 3; i++, j--)
+        palette[j] = [hsl[0], hsl[1], hsl[2] - i * 15, hsl[3]]
+    }
+    return palette
+  }
+
   // Inject $hello(msg) in Vue, context and store.
   inject('hexToRgb', hexToRgb)
   inject('rgbToHsl', rgbToHsl)
+  inject('generatePalette', generatePalette)
   // For Nuxt <= 2.12, also add 👇
   context.$rgbToHsl = rgbToHsl
   context.$hexToRgb = hexToRgb
+  context.$generatePalette = generatePalette
 }
