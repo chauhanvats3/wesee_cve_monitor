@@ -1,17 +1,23 @@
 <template>
-  <div class="tech-pill">
+  <div class="tech-pill" @click="$emit('pill-clicked', tech)">
     <p :style="{ background: bgColors[2], color: bgColors[0] }">
       {{ tech.name }}
     </p>
     <p :style="{ background: bgColors[1] }">{{ tech.ver }}</p>
-    <p :style="{ background: bgColors[0] }">{{ tech.cves.length }}</p>
+    <p :style="{ background: bgColors[0], color: bgColors[2] }">
+      {{ tech.cves.length }}
+    </p>
   </div>
 </template>
 
 <script>
 export default {
   props: ['tech'],
-  methods: {},
+  methods: {
+    pillClicked() {
+      alert(this.tech.name)
+    },
+  },
   computed: {
     bgColors() {
       let color = this.tech.color
@@ -31,8 +37,10 @@ export default {
 <style lang="sass" scoped>
 .tech-pill
     @include flexify-row
+    margin: 0 10px
+    cursor: pointer
     p
-        margin: 30px 0px
+        margin: 20px 0px
         color: white
         padding: 10px 40px 10px 20px
         border-radius: 10px

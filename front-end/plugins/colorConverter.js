@@ -58,11 +58,11 @@ export default (context, inject) => {
     if (hsl[1] >= hsl[2]) {
       //If Color is Dark
       for (let i = 0; i < 3; i++)
-        palette[i] = [hsl[0], hsl[1], hsl[2] + i * 15, hsl[3]]
+        palette[i] = [hsl[0], hsl[1], (hsl[2] + i * 18.5) % 100, hsl[3]]
     } else {
       //If Color is light
       for (let i = 0, j = 2; i < 3; i++, j--)
-        palette[j] = [hsl[0], hsl[1], hsl[2] - i * 15, hsl[3]]
+        palette[j] = [hsl[0], hsl[1], (hsl[2] - i * 18.5) % 100, hsl[3]]
     }
     return palette
   }

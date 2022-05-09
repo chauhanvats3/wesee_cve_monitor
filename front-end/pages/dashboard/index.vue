@@ -40,8 +40,7 @@ export default {
   .domains
     width: 100%
     height: 100%
-    margin: 20px
-    padding: 20px
+    padding: 0 20px
     ul
       margin: 50px 20px
       li
