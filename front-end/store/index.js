@@ -1,15 +1,5 @@
 //state are app-wide variables
 export const state = () => ({
-  domains: [
-    {
-      name: 'vatsal.dev',
-      verified: false,
-    },
-    {
-      name: 'lorem.ipsum',
-      verified: true,
-    },
-  ],
   user: {
     access: null,
     refresh: null,
@@ -19,9 +9,6 @@ export const state = () => ({
 
 //mutations are synchronous and for inside app
 export const mutations = {
-  addDomain(state, domain) {
-    state.domains.push({ name: domain, verified: false })
-  },
   addTokens(state, { access, refresh }) {
     state.user.access = access
     state.user.refresh = refresh
@@ -30,6 +17,7 @@ export const mutations = {
     this.$cookies.set('jwt-access', access, { sameSite: true })
     this.$cookies.set('jwt-refresh', refresh, { sameSite: true })
   },
+
   destroyTokens(state) {
     state.user.access = null
     state.user.refresh = null
@@ -38,9 +26,6 @@ export const mutations = {
 
     this.$cookies.remove('jwt-access')
     this.$cookies.remove('jwt-refresh')
-  },
-  addDomainsFromBackend(state, domains) {
-    state.domains = domains
   },
 }
 
@@ -53,17 +38,11 @@ export const actions = {
     })
     context.commit('addTokens', tokens)
   },
-  async getDomains(context) {
-    this.$axios.setToken(this.$cookies.get('jwt-access'), 'Bearer')
-    let domains = await this.$axios.$get('/domains/')
-    context.commit('addDomainsFromBackend', domains)
-    return domains
-  },
 }
 
 //getters help inside app to get data from vuex store
 export const getters = {
-  getAllDomains(state) {
-    return state.domains
+  getCookies() {
+    this.$cookies.get('jwt-access')
   },
 }

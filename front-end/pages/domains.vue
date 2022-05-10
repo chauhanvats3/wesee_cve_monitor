@@ -32,7 +32,7 @@ export default {
     })
   },
   methods: {
-    ...mapActions(['getDomains']),
+    ...mapActions({ getDomains: 'dashboard/getDomainsFromBackend' }),
   },
 }
 </script>

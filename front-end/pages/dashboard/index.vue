@@ -19,6 +19,7 @@ import { mapGetters } from 'vuex'
 export default {
   computed: {
     allDomains: function () {
+      console.log(this.getAllDomains())
       return this.getAllDomains()
     },
   },
