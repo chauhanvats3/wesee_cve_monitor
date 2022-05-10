@@ -1,15 +1,55 @@
 <template>
   <div class="login-box">
-    <input type="text" class="txtbox" id="user" placeholder="username" />
+    <input
+      type="text"
+      class="txtbox"
+      id="user"
+      placeholder="username"
+      v-model.trim="username"
+    />
 
-    <input type="password" class="txtbox" id="pass" placeholder="password" />
-
-    <button class="button">Login</button>
+    <input
+      type="password"
+      class="txtbox"
+      id="pass"
+      placeholder="password"
+      v-model.trim="password"
+    />
+    <button class="button" @click="login">Login</button>
+    <p v-if="incorrectAuth">Wrong Credentials!</p>
   </div>
 </template>
 
 <script>
-export default {}
+import { mapActions, mapMutations } from 'vuex'
+
+export default {
+  data() {
+    return {
+      username: '',
+      password: '',
+      incorrectAuth: false,
+    }
+  },
+  methods: {
+    ...mapActions(['getTokens']),
+    ...mapMutations(['destroyTokens']),
+    login() {
+      this.getTokens({
+        username: this.username,
+        password: this.password,
+      })
+        .then(() => {
+          this.$router.push({ name: 'domains' })
+        })
+        .catch((err) => {
+          console.log(err)
+          this.incorrectAuth = true
+          this.destroyTokens()
+        })
+    },
+  },
+}
 </script>
 
 <style lang="sass" scoped>
@@ -38,6 +78,11 @@ export default {}
         cursor: pointer
         color: white
         width: max-content
+
+    p
+        color: $red
+        font-size: 0.5rem
+        margin: 20px
 
     @media screen and (min-width: $medium) and (max-width: $large)
         .txtbox

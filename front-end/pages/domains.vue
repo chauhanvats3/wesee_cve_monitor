@@ -4,7 +4,7 @@
     <Breadcrumb />
     <div class="content">
       <DomainCard
-        v-for="(domainInfo, index) in allDomains"
+        v-for="(domainInfo, index) in domains"
         :key="index"
         :domain="domainInfo.name"
         :verified="domainInfo.verified"
@@ -17,15 +17,22 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import DomainCard from '../components/DomainCard.vue'
-import NewDomainCard from '~/components/NewDomainCard.vue'
+import { mapActions } from 'vuex'
+
 export default {
-  components: { DomainCard, NewDomainCard, DomainCard },
-  computed: {
-    allDomains: function () {
-      return this.$store.getters.getAllDomains
-    },
+  data() {
+    return {
+      domains: [],
+    }
+  },
+  mounted() {
+    this.getDomains().then((data) => {
+      this.domains = data
+      console.log(data)
+    })
+  },
+  methods: {
+    ...mapActions(['getDomains']),
   },
 }
 </script>
