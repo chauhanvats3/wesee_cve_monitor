@@ -5,7 +5,7 @@
       v-for="(subdomain, index) in getSubdomains(domain)"
       :key="index"
     >
-      <div class="wrapper" v-if="!subdomain.exclude">
+      <div class="wrapper" v-if="subdomain.include">
         <div class="top-bar">
           <h3>{{ subdomain.name }}</h3>
           <p class="exclude" @click.stop="toggleExclusion(subdomain.name)">
@@ -33,10 +33,10 @@ import { mapGetters, mapMutations } from 'vuex'
 export default {
   props: ['domain'],
   computed: {
-    ...mapGetters('dashboard', ['getSubdomains']),
+    ...mapGetters('domains', ['getSubdomains']),
   },
   methods: {
-    ...mapMutations({ excludeToggle: 'dashboard/excludeToggle' }),
+    ...mapMutations({ excludeToggle: 'domains/excludeToggle' }),
     subPillClicked(info) {
       this.$emit('sub-pill-clicked', info)
     },

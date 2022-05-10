@@ -1,60 +1,50 @@
 <template>
   <div class="dashboard-slug">
     <Nav />
-    <ul>
-      <li v-for="domain in getDomainInfo(slug)" :key="domain.name">
-        <h1>
-          {{ domain.name }}
-        </h1>
+    <h1>
+      {{ thisDomain.name }}
+    </h1>
 
-        <div class="techs">
-          <TechPill
-            v-for="(tech, index) in domain.techs"
-            :key="index"
-            :tech="tech"
-            v-on:pill-clicked="openTechDetails"
-          />
-        </div>
-        <div
-          class="modal-wrapper"
-          ref="techModalWrapper"
-          @click.stop="closeModal"
-        >
-          <TechModal :tech="techToOpen" />
-        </div>
+    <div class="techs">
+      <TechPill
+        v-for="(tech, index) in thisDomain.techs"
+        :key="index"
+        :tech="tech"
+        v-on:pill-clicked="openTechDetails"
+      />
+    </div>
+    <div class="modal-wrapper" ref="techModalWrapper" @click.stop="closeModal">
+      <TechModal :tech="techToOpen" />
+    </div>
 
-        <div class="options">
-          <div class="enum">
-            <input
-              type="checkbox"
-              name="enumerate"
-              id="enumChkbx"
-              ref="chkbxEnum"
-            />
-            <p
-              @click="checkBoxClick"
-              style="cursor: pointer; letter-spacing: 2px"
-            >
-              Enumerate Subdomains?
-            </p>
-          </div>
-          <div class="addDomain">
-            <input
-              type="text"
-              name="subdomain"
-              id="subDomainTxt"
-              ref="newSubdomain"
-              placeholder="https://"
-            />
-            <div class="btn add-subdomain" @click="addNewSubdomain">
-              <p>Add Subdomain</p>
-            </div>
-          </div>
+    <div class="options">
+      <div class="enum">
+        <input
+          type="checkbox"
+          name="enumerate"
+          id="enumChkbx"
+          ref="chkbxEnum"
+        />
+        <p @click="checkBoxClick" style="cursor: pointer; letter-spacing: 2px">
+          Enumerate Subdomains?
+        </p>
+      </div>
+      <div class="addDomain">
+        <input
+          type="text"
+          name="subdomain"
+          id="subDomainTxt"
+          ref="newSubdomain"
+          placeholder="https://"
+        />
+        <div class="btn add-subdomain">
+          <p>Add Subdomain</p>
         </div>
+      </div>
+    </div>
 
-        <Subdomains :domain="slug" v-on:sub-pill-clicked="openSubTechDetails" />
-      </li>
-    </ul>
+    <Subdomains :domain="slug" v-on:sub-pill-clicked="openSubTechDetails" />
+
     <ExcludedSubdomains :domain="slug" />
   </div>
 </template>
@@ -63,54 +53,60 @@
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
-  async asyncData({ params }) {
-    const slug = params.slug
-    return { slug }
+  async asyncData(context) {
+    const slug = context.params.slug
+    let status = await context.store.dispatch('domains/getDomainsFromBackend')
+    if (status != 200) {
+      context.app.router.push('/')
+    }
+    return { slug, status }
   },
   data() {
     return {
       techToOpen: {
         name: 'VueJs',
-        ver: '2.5.4',
+        version: '2.5.4',
         cves: ['This is a dummy CVE 1', 'Dummy CVE 2', 'CVE 3'],
         color: '#42b883',
       },
     }
   },
   mounted() {
-    console.log(this.slug)
-    let defaultTech = this.getDomainInfo(this.slug)[0].techs[0]
+    let defaultTech = this.domainInfo(this.slug).techs[0]
     this.techToOpen = defaultTech
   },
   computed: {
-    ...mapGetters('dashboard', ['getDomainInfo', 'getSubdomains']),
+    ...mapGetters({
+      domains: 'domains/getAllDomains',
+      domainInfo: 'domains/getDomainInfo',
+    }),
+    thisDomain() {
+      return this.domainInfo(this.slug)
+    },
   },
   methods: {
-    ...mapMutations({
-      addSubdomain: 'dashboard/addSubdomain',
-    }),
     openTechDetails(tech) {
       this.techToOpen = tech
-      this.$refs.techModalWrapper[0].classList.add('show')
+      this.$refs.techModalWrapper.classList.add('show')
     },
     openSubTechDetails(info) {
       this.techToOpen = info.tech
-      this.$refs.techModalWrapper[0].classList.add('show')
+      this.$refs.techModalWrapper.classList.add('show')
     },
     closeModal() {
-      this.$refs.techModalWrapper[0].classList.remove('show')
+      this.$refs.techModalWrapper.classList.remove('show')
     },
     checkBoxClick() {
-      this.$refs.chkbxEnum[0].checked = !this.$refs.chkbxEnum[0].checked
+      this.$refs.chkbxEnum.checked = !this.$refs.chkbxEnum[0].checked
     },
-    addNewSubdomain() {
+    /*  addNewSubdomain() {
       let info = {
         domain: this.slug,
         subdomain: this.$refs.newSubdomain[0].value,
       }
       this.addSubdomain(info)
       this.$refs.newSubdomain[0].value = ''
-    },
+    }, */
   },
 }
 </script>

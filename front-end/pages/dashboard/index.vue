@@ -4,7 +4,7 @@
     <div class="domains">
       <h1>All Domains :</h1>
       <ul>
-        <li v-for="(domain, index) in allDomains" :key="index">
+        <li v-for="(domain, index) in domains" :key="index">
           <NuxtLink :to="'/dashboard/' + domain.name">
             {{ domain.name }}
           </NuxtLink>
@@ -16,16 +16,18 @@
 
 <script>
 import { mapGetters } from 'vuex'
+
 export default {
   computed: {
-    allDomains: function () {
-      console.log(this.getAllDomains())
-      return this.getAllDomains()
-    },
+    ...mapGetters({ domains: 'domains/getAllDomains' }),
   },
   mounted() {},
-  methods: {
-    ...mapGetters(['getAllDomains']),
+  methods: {},
+  async asyncData(context) {
+    let status = await context.store.dispatch('domains/getDomainsFromBackend')
+    if (status != 200) {
+      context.app.router.push('/')
+    }
   },
 }
 </script>

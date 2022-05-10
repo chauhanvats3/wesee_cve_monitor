@@ -7,7 +7,7 @@
         v-for="(subdomain, index) in getSubdomains(domain)"
         :key="index"
       >
-        <div class="wrapper" v-if="subdomain.exclude">
+        <div class="wrapper" v-if="!subdomain.include">
           <div class="top-bar">
             <p class="name">{{ subdomain.name }}</p>
 
@@ -30,10 +30,10 @@ import { mapGetters, mapMutations } from 'vuex'
 export default {
   props: ['domain'],
   computed: {
-    ...mapGetters('dashboard', ['getSubdomains']),
+    ...mapGetters('domains', ['getSubdomains']),
   },
   methods: {
-    ...mapMutations({ excludeToggle: 'dashboard/excludeToggle' }),
+    ...mapMutations({ excludeToggle: 'domains/excludeToggle' }),
     toggleExclusion(subdomain) {
       let info = {
         domain: this.domain,

@@ -4,12 +4,14 @@ export const state = () => ({
 
 export const mutations = {
   excludeToggle(state, info) {
-    for (let i = 0; i < allDomains.length; i++) {
-      if (allDomains[i].name == info.domain) {
-        let subdomains = allDomains[i].subdomains
+    let domains = state.allDomains
+    for (let i = 0; i < domains.length; i++) {
+      if (domains[i].name == info.domain) {
+        let subdomains = domains[i].subdomains
+        console.log(subdomains)
         for (const subdomain of subdomains) {
           if (subdomain.name == info.subdomain) {
-            subdomain.exclude = !subdomain.exclude
+            subdomain.include = !subdomain.include
           }
         }
       }
@@ -33,11 +35,15 @@ export const actions = {
     context.commit('setDomains', domains)
     return 200
   },
+  async addDomainToBackend(context, domainInfo) {},
 }
 
 export const getters = {
   getDomainInfo: (state) => (domain) => {
-    return [state.domains]
+    let domains = state.allDomains
+    for (let i = 0; i < domains.length; i++) {
+      if (domains[i].name == domain) return domains[i]
+    }
   },
   getSubdomains: (state) => (domain) => {
     let domains = state.allDomains

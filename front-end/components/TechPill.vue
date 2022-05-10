@@ -3,7 +3,7 @@
     <p :style="{ background: bgColors[2], color: bgColors[0] }">
       {{ tech.name }}
     </p>
-    <p :style="{ background: bgColors[1] }">{{ tech.ver }}</p>
+    <p :style="{ background: bgColors[1] }">{{ tech.version }}</p>
     <p :style="{ background: bgColors[0], color: bgColors[2] }">
       {{ tech.cves.length }}
     </p>
