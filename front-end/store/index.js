@@ -1,8 +1,6 @@
 //state are app-wide variables
 export const state = () => ({
   user: {
-    access: null,
-    refresh: null,
     isAuthenticated: false,
   },
 })
@@ -10,8 +8,6 @@ export const state = () => ({
 //mutations are synchronous and for inside app
 export const mutations = {
   addTokens(state, { access, refresh }) {
-    state.user.access = access
-    state.user.refresh = refresh
     state.user.isAuthenticated = true
 
     this.$cookies.set('jwt-access', access, { sameSite: true })
@@ -19,10 +15,7 @@ export const mutations = {
   },
 
   destroyTokens(state) {
-    state.user.access = null
-    state.user.refresh = null
     state.user.isAuthenticated = false
-    state.domain = [{}]
 
     this.$cookies.remove('jwt-access')
     this.$cookies.remove('jwt-refresh')
@@ -38,11 +31,18 @@ export const actions = {
     })
     context.commit('addTokens', tokens)
   },
+  async getPing(context) {
+    let access_token = this.$cookies.get('jwt-access')
+    this.$axios.setToken(access_token, 'Bearer')
+    let users = []
+    try {
+      users = await this.$axios.$get('/users/')
+    } catch (error) {
+      return 401
+    }
+    return 200
+  },
 }
 
 //getters help inside app to get data from vuex store
-export const getters = {
-  getCookies() {
-    this.$cookies.get('jwt-access')
-  },
-}
+export const getters = {}

@@ -17,22 +17,28 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   data() {
     return {
-      domains: [],
+      isAuthenticated: this.$store.state.user.isAuthenticated,
+    }
+  } /* 
+  async fetch() {
+    let status = await this.$store.dispatch('domains/getDomainsFromBackend')
+    console.log('status domains : ' + status)
+    if (status != 200) this.$router.push('/')
+  }, */,
+  async asyncData(context) {
+    let status = await context.store.dispatch('domains/getDomainsFromBackend')
+    if (status != 200) {
+      context.app.router.push('/')
     }
   },
-  mounted() {
-    this.getDomains().then((data) => {
-      this.domains = data
-      console.log(data)
-    })
-  },
-  methods: {
-    ...mapActions({ getDomains: 'dashboard/getDomainsFromBackend' }),
+  mounted() {},
+  computed: {
+    ...mapGetters({ domains: 'domains/getAllDomains' }),
   },
 }
 </script>

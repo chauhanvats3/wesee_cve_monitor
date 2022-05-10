@@ -20,8 +20,26 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   name: 'Home',
+  data() {
+    return {}
+  } /*
+  async fetch() {
+    let status = await this.$store.dispatch('domains/getDomainsFromBackend')
+    if (status == 200) {
+      this.$router.push('/domains')
+    }
+  }, */,
+  async asyncData(context) {
+    let status = await context.store.dispatch('getPing')
+    console.log(status)
+    if (status == 200) {
+      context.app.router.push('/domains')
+    }
+  },
 }
 </script>
 
