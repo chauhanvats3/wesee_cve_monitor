@@ -8,7 +8,6 @@ export const mutations = {
     for (let i = 0; i < domains.length; i++) {
       if (domains[i].name == info.domain) {
         let subdomains = domains[i].subdomains
-        console.log(subdomains)
         for (const subdomain of subdomains) {
           if (subdomain.name == info.subdomain) {
             subdomain.include = !subdomain.include
@@ -50,6 +49,19 @@ export const getters = {
     for (let i = 0; i < domains.length; i++) {
       if (domains[i].name == domain) {
         return domains[i].subdomains
+      }
+    }
+  },
+  getExcludedSubdomains: (state) => (domain) => {
+    let domains = state.allDomains
+    let excluded = []
+    for (let i = 0; i < domains.length; i++) {
+      if (domains[i].name == domain) {
+        let subdomains = domains[i].subdomains
+        for (let j = 0; j < subdomains.length; j++) {
+          if (!subdomains[j].include) excluded.push(subdomains[i])
+        }
+        return excluded
       }
     }
   },

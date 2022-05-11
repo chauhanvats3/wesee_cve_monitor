@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-slug">
     <Nav />
-    <h1>
+    <h1 ref="h1">
       {{ thisDomain.name }}
     </h1>
 
@@ -24,6 +24,7 @@
           name="enumerate"
           id="enumChkbx"
           ref="chkbxEnum"
+          v-model="enumSubdomains"
         />
         <p @click="checkBoxClick" style="cursor: pointer; letter-spacing: 2px">
           Enumerate Subdomains?
@@ -42,10 +43,12 @@
         </div>
       </div>
     </div>
-
-    <Subdomains :domain="slug" v-on:sub-pill-clicked="openSubTechDetails" />
-
-    <ExcludedSubdomains :domain="slug" />
+    <Subdomains
+      v-if="enumSubdomains"
+      :domain="slug"
+      v-on:sub-pill-clicked="openSubTechDetails"
+    />
+    <ExcludedSubdomains :domain="slug" v-if="enumSubdomains && excludedExist" />
   </div>
 </template>
 
@@ -63,25 +66,28 @@ export default {
   },
   data() {
     return {
-      techToOpen: {
-        name: 'VueJs',
-        version: '2.5.4',
-        cves: ['This is a dummy CVE 1', 'Dummy CVE 2', 'CVE 3'],
-        color: '#42b883',
-      },
+      techToOpen: {},
+      enumSubdomains: false,
+      excludedSubdomainsExist: false,
     }
   },
   mounted() {
-    let defaultTech = this.domainInfo(this.slug).techs[0]
-    this.techToOpen = defaultTech
+    this.enumSubdomains = this.domainInfo(this.slug).enumerate
+    this.getExcluded(this.slug)
   },
   computed: {
     ...mapGetters({
       domains: 'domains/getAllDomains',
       domainInfo: 'domains/getDomainInfo',
+      getExcluded: 'domains/getExcludedSubdomains',
     }),
     thisDomain() {
       return this.domainInfo(this.slug)
+    },
+    excludedExist() {
+      let excludedSubdomains = this.getExcluded(this.slug)
+      console.log(excludedSubdomains)
+      return excludedSubdomains.length == 0 ? false : true
     },
   },
   methods: {
@@ -97,8 +103,9 @@ export default {
       this.$refs.techModalWrapper.classList.remove('show')
     },
     checkBoxClick() {
-      this.$refs.chkbxEnum.checked = !this.$refs.chkbxEnum[0].checked
+      this.enumSubdomains = !this.enumSubdomains
     },
+    getExcludedSubdomains() {},
     /*  addNewSubdomain() {
       let info = {
         domain: this.slug,

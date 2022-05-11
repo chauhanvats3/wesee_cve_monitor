@@ -1,5 +1,5 @@
 <template>
-  <div class="tech-modal" @click.stop="modalClicked">
+  <div class="tech-modal" @click.stop="modalClicked" v-if="tech.name">
     <div class="top-bar">
       <p :style="{ background: bgColors[2], color: bgColors[0] }">
         {{ tech.name }}
