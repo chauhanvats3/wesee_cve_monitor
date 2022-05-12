@@ -1,7 +1,6 @@
 <template>
   <div class="domains">
     <Nav />
-    <Breadcrumb />
     <div class="content">
       <DomainCard
         v-for="(domainInfo, index) in domains"
@@ -42,7 +41,7 @@ export default {
 
 <style lang="sass" scoped>
 .domains
-
+  margin-top: 100px
   .content
     @include flexify-row
     flex-wrap: wrap

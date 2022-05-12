@@ -77,6 +77,9 @@ export default {
       this.$refs.verifyOverlay.classList.toggle('show')
     },
     deleteClicked() {
+      if (this.$refs.cta.children[2].innerText == 'Yes') {
+        this.deleteDomain()
+      }
       this.$refs.cta.children[0].classList.add('hide')
       this.$refs.cta.children[1].classList.add('hide')
       this.$refs.cta.children[2].innerText = 'Yes'
@@ -98,6 +101,7 @@ export default {
     },
     async deleteDomain() {
       let status = await this.deleteThisDomain(this.domain)
+      console.log(status)
     },
   },
 }
