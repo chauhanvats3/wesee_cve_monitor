@@ -14,6 +14,7 @@
       id="pass"
       placeholder="password"
       v-model.trim="password"
+      @keypress.enter="login"
     />
     <button class="button" @click="login">Login</button>
     <p v-if="incorrectAuth">Wrong Credentials!</p>

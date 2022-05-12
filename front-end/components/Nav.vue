@@ -7,13 +7,25 @@
     <div class="menu" v-if="$route.name != 'index'">
       <NuxtLink to="/domains">Domains</NuxtLink>
       <NuxtLink to="/dashboard">Dashboard</NuxtLink>
-      <NuxtLink to="/user">User</NuxtLink>
+      <a style="cursor: pointer" @click="logout">Log Out</a>
+      <!-- 
+      <NuxtLink to="/user" @click="destroyTokens">Logout</NuxtLink> -->
     </div>
   </div>
 </template>
 
 <script>
-export default {}
+import { mapMutations } from 'vuex'
+
+export default {
+  methods: {
+    ...mapMutations(['destroyTokens']),
+    logout() {
+      this.destroyTokens()
+      this.$router.push('/')
+    },
+  },
+}
 </script>
 
 <style lang="sass" scoped>

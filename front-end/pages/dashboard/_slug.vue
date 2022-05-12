@@ -56,7 +56,19 @@
 import { mapGetters, mapMutations } from 'vuex'
 
 export default {
+  data() {
+    return {
+      isAuthenticated: this.$store.state.user.isAuthenticated,
+      techToOpen: {},
+      enumSubdomains: false,
+      excludedSubdomainsExist: false,
+    }
+  },
   async asyncData(context) {
+    if (!context.store.state.user.isAuthenticated) {
+      context.app.router.push('/')
+      return 401
+    }
     const slug = context.params.slug
     let status = await context.store.dispatch('domains/getDomainsFromBackend')
     if (status != 200) {
@@ -64,14 +76,11 @@ export default {
     }
     return { slug, status }
   },
-  data() {
-    return {
-      techToOpen: {},
-      enumSubdomains: false,
-      excludedSubdomainsExist: false,
-    }
-  },
   mounted() {
+    if (!this.isAuthenticated || this.isAuthenticated == undefined) {
+      this.$router.push('/')
+    }
+
     this.enumSubdomains = this.domainInfo(this.slug).enumerate
     this.getExcluded(this.slug)
   },
@@ -86,7 +95,6 @@ export default {
     },
     excludedExist() {
       let excludedSubdomains = this.getExcluded(this.slug)
-      console.log(excludedSubdomains)
       return excludedSubdomains.length == 0 ? false : true
     },
   },

@@ -5,7 +5,7 @@
       <h1>All Domains :</h1>
       <ul>
         <li v-for="(domain, index) in domains" :key="index">
-          <NuxtLink :to="'/dashboard/' + domain.name">
+          <NuxtLink :to="'/dashboard/' + domain.name" v-if="domain.verified">
             {{ domain.name }}
           </NuxtLink>
         </li>
@@ -18,13 +18,24 @@
 import { mapGetters } from 'vuex'
 
 export default {
+  data() {
+    return {
+      isAuthenticated: this.$store.state.user.isAuthenticated,
+    }
+  },
   computed: {
     ...mapGetters({ domains: 'domains/getAllDomains' }),
   },
-  mounted() {},
-  methods: {},
+  mounted() {
+    if (!this.isAuthenticated) this.$router.push('/')
+  },
   async asyncData(context) {
+    if (!context.store.state.user.isAuthenticated) {
+      context.app.router.push('/')
+      return 401
+    }
     let status = await context.store.dispatch('domains/getDomainsFromBackend')
+
     if (status != 200) {
       context.app.router.push('/')
     }

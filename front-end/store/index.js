@@ -8,17 +8,15 @@ export const state = () => ({
 //mutations are synchronous and for inside app
 export const mutations = {
   addTokens(state, { access, refresh }) {
+    if (state.user.isAuthenticated) return
     state.user.isAuthenticated = true
-
     this.$cookies.set('jwt-access', access, { sameSite: true })
     this.$cookies.set('jwt-refresh', refresh, { sameSite: true })
   },
 
   destroyTokens(state) {
     state.user.isAuthenticated = false
-
-    this.$cookies.remove('jwt-access')
-    this.$cookies.remove('jwt-refresh')
+    this.$cookies.removeAll()
   },
 }
 

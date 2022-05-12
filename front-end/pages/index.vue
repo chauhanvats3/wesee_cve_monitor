@@ -25,7 +25,9 @@ import { mapActions } from 'vuex'
 export default {
   name: 'Home',
   data() {
-    return {}
+    return {
+      isAuthenticated: this.$store.state.user.isAuthenticated,
+    }
   } /*
   async fetch() {
     let status = await this.$store.dispatch('domains/getDomainsFromBackend')
@@ -34,11 +36,17 @@ export default {
     }
   }, */,
   async asyncData(context) {
+    if (!context.store.state.user.isAuthenticated) {
+      context.store.dispatch('destroyTokens')
+      return 401
+    }
     let status = await context.store.dispatch('getPing')
-    console.log(status)
     if (status == 200) {
       context.app.router.push('/domains')
     }
+  },
+  mounted() {
+    if (!this.isAuthenticated) this.$router.push('/')
   },
 }
 </script>

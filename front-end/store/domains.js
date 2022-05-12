@@ -33,7 +33,6 @@ export const mutations = {
       }
     }
     state.allDomains = domains
-    console.log(state.allDomains)
   },
 }
 
@@ -65,7 +64,6 @@ export const actions = {
   },
   async deleteDomainFromBackend(context, domainName) {
     let domainId = context.getters.getDomainInfo(domainName, 'id')
-    console.log('Id : ' + domainId)
     let access_token = this.$cookies.get('jwt-access')
     if (access_token) {
       this.$axios.setToken(access_token, 'Bearer')
@@ -82,15 +80,13 @@ export const actions = {
 
 export const getters = {
   getDomainInfo: (state) => (domainName, infoAsked) => {
-    console.log(domainName + ' ' + infoAsked) /* 
+    /* 
     if (!infoAsked || infoAsked == undefined || infoAsked == void 0)
       infoAsked = 'name' */
     let domains = state.allDomains
     for (let i = 0; i < domains.length; i++) {
-      console.log(`${infoAsked}`)
       if (domains[i].name.includes(domainName)) {
         if (!infoAsked || infoAsked == undefined || infoAsked == void 0) {
-          console.log(domains[i])
           return domains[i]
         } else return domains[i][`${infoAsked}`]
       }
