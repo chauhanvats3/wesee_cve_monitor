@@ -30,11 +30,12 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
 
 export default {
   methods: {
     ...mapMutations(['addDomain']),
+    ...mapActions({ domainToServer: 'domains/addDomainToBackend' }),
     openOverlay() {
       this.$refs.overlay.classList.add('show')
     },
@@ -46,7 +47,15 @@ export default {
       this.$refs.checkbox.checked = !this.$refs.checkbox.checked
     },
     addNewDomain() {
-      this.addDomain(this.$refs.domainInput.value)
+      let domainName = this.$refs.domainInput.value
+      if (!domainName.startsWith('http')) domainName = 'https://' + domainName
+      let domainInfo = {
+        full_name: domainName,
+        enumerate: this.$refs.checkbox.checked,
+      }
+
+      this.domainToServer(domainInfo)
+
       this.$refs.domainInput.value = ''
     },
   },

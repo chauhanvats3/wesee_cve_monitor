@@ -54,19 +54,22 @@
           <p>verify</p>
         </div>
       </div>
+
+      <p class="delete" @click="deleteDomain">Delete it, it's not my site</p>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   props: ['domain', 'verified'],
   data() {
-    return {
-      deleteDomain: false,
-    }
+    return {}
   },
   methods: {
+    ...mapActions({ deleteThisDomain: 'domains/deleteDomainFromBackend' }),
     openVerifyInstructions() {
       this.$refs.verifyOverlay.classList.toggle('show')
     },
@@ -92,6 +95,9 @@ export default {
         this.$refs.cta.classList.remove('deleteClicked')
         this.$refs.cta.children[3].classList.remove('show')
       }, 500)
+    },
+    async deleteDomain() {
+      let status = await this.deleteThisDomain(this.domain)
     },
   },
 }
@@ -281,7 +287,10 @@ $top-row-height : 50px
               margin-left: 15px
               border-radius: 10px
               cursor: pointer
-
+        .delete
+            color: $red
+            font-size: 0.65rem
+            cursor: pointer
 
     &:hover .overlay.verified
         top: 0

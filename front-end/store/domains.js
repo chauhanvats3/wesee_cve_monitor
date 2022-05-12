@@ -19,6 +19,22 @@ export const mutations = {
   setDomains(state, data) {
     state.allDomains = data
   },
+  addDomain(state, domain) {
+    domain.name = domain.full_name
+    domain.verified = false
+    domain.enumerate = false
+    state.allDomains.push(domain)
+  },
+  removeDomain(state, domainId) {
+    let domains = state.allDomains
+    for (let i = 0; i < domains.length; i++) {
+      if (domains[i].id == domainId) {
+        domains.splice(i, 1)
+      }
+    }
+    state.allDomains = domains
+    console.log(state.allDomains)
+  },
 }
 
 export const actions = {
@@ -34,14 +50,58 @@ export const actions = {
     context.commit('setDomains', domains)
     return 200
   },
-  async addDomainToBackend(context, domainInfo) {},
+  async addDomainToBackend(context, domainInfo) {
+    let access_token = this.$cookies.get('jwt-access')
+    if (access_token) {
+      this.$axios.setToken(access_token, 'Bearer')
+      try {
+        await this.$axios.$post('/domains/', domainInfo)
+        context.commit('addDomain', domainInfo)
+      } catch (error) {
+        return error
+      }
+      return 200
+    }
+  },
+  async deleteDomainFromBackend(context, domainName) {
+    let domainId = context.getters.getDomainInfo(domainName, 'id')
+    console.log('Id : ' + domainId)
+    let access_token = this.$cookies.get('jwt-access')
+    if (access_token) {
+      this.$axios.setToken(access_token, 'Bearer')
+      try {
+        await this.$axios.$delete('/domains/' + domainId)
+        context.commit('removeDomain', domainId)
+      } catch (error) {
+        return error
+      }
+      return 200
+    }
+  },
 }
 
 export const getters = {
-  getDomainInfo: (state) => (domain) => {
+  getDomainInfo: (state) => (domainName, infoAsked) => {
+    console.log(domainName + ' ' + infoAsked) /* 
+    if (!infoAsked || infoAsked == undefined || infoAsked == void 0)
+      infoAsked = 'name' */
     let domains = state.allDomains
     for (let i = 0; i < domains.length; i++) {
-      if (domains[i].name == domain) return domains[i]
+      console.log(`${infoAsked}`)
+      if (domains[i].name.includes(domainName)) {
+        if (!infoAsked || infoAsked == undefined || infoAsked == void 0) {
+          console.log(domains[i])
+          return domains[i]
+        } else return domains[i][`${infoAsked}`]
+      }
+    }
+  },
+  getDomainId: (state) => (domainName) => {
+    let domains = state.allDomains
+    for (let i = 0; i < domains.length; i++) {
+      if (domains[i].name == domainName) {
+        return domains[i].id
+      }
     }
   },
   getSubdomains: (state) => (domain) => {
