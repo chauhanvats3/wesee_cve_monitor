@@ -2,29 +2,29 @@
   <div class="domain-card">
     <div
       class="overlay"
-      v-bind:class="{ verified: verified == true }"
+      v-bind:class="{ verified: domainInfo.verified == true }"
       @mouseleave="resetDeleteClicked"
     >
       <div class="top-row">
         <div class="domain">
-          <p>{{ domain }}</p>
+          <p>{{ domainInfo.name }}</p>
         </div>
         <div
           class="verify-btn"
-          v-if="verified == false"
+          v-if="domainInfo.verified == false"
           @click.stop="openVerifyInstructions"
         >
           <p>how to verify?</p>
         </div>
       </div>
 
-      <div class="content" v-if="verified == true">
+      <div class="content" v-if="domainInfo.verified == true">
         <p>Number Of Subdomains : 5</p>
         <p>No Of Techs Found : 55</p>
         <p>No Of CVEs Discovered: 555</p>
       </div>
 
-      <div class="cta" v-if="verified == true" ref="cta">
+      <div class="cta" v-if="domainInfo.verified == true" ref="cta">
         <div class="btn verified">Verified</div>
         <div class="btn dashboard">
           <NuxtLink :to="'/dashboard/' + domain">Dashboard</NuxtLink>
@@ -34,7 +34,11 @@
       </div>
     </div>
 
-    <div class="verify-overlay" v-if="verified == false" ref="verifyOverlay">
+    <div
+      class="verify-overlay"
+      v-if="domainInfo.verified == false"
+      ref="verifyOverlay"
+    >
       <div class="close" @click.stop="closeVerifyInstructions">
         <p>X</p>
       </div>
@@ -42,13 +46,17 @@
         <p>1. Sign In to your DNS provider</p>
         <p>
           2. Copy the text record below into the DNS configuration for
-          <span>{{ domain }}</span>
+          <span>{{ domainInfo.name }}</span>
         </p>
         <p>3. Press “verify" after a while</p>
       </div>
       <div class="bottom-row">
         <div class="verification-code">
-          <p>we-see-verification.{{ domain }}=as21db6537r2a</p>
+          <p>
+            we-see-verification.{{ domainInfo.name }}={{
+              domainInfo.verify_code
+            }}
+          </p>
         </div>
         <div class="btn verify-now">
           <p>verify</p>
@@ -64,7 +72,7 @@
 import { mapActions } from 'vuex'
 
 export default {
-  props: ['domain', 'verified'],
+  props: ['domainInfo'],
   data() {
     return {}
   },
@@ -100,7 +108,7 @@ export default {
       }, 500)
     },
     async deleteDomain() {
-      let status = await this.deleteThisDomain(this.domain)
+      let status = await this.deleteThisDomain(this.domainInfo.name)
       console.log(status)
     },
   },

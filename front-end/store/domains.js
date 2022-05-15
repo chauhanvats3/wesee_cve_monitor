@@ -19,10 +19,13 @@ export const mutations = {
   setDomains(state, data) {
     state.allDomains = data
   },
-  addDomain(state, domain) {
-    domain.name = domain.full_name
+  addDomain(state, domainInfo) {
+    let domain = {}
+    domain.full_name = domainInfo.full_name
+    domain.name = domainInfo.full_name.split('://')[1]
     domain.verified = false
-    domain.enumerate = false
+    domain.enumerate = domainInfo.enumerate
+    domain.verify_code = domainInfo.verify_code
     state.allDomains.push(domain)
   },
   removeDomain(state, domainId) {
@@ -54,7 +57,8 @@ export const actions = {
     if (access_token) {
       this.$axios.setToken(access_token, 'Bearer')
       try {
-        await this.$axios.$post('/domains/', domainInfo)
+        let status = await this.$axios.$post('/domains/', domainInfo)
+        domainInfo.id = status.id
         context.commit('addDomain', domainInfo)
       } catch (error) {
         return error
@@ -80,9 +84,6 @@ export const actions = {
 
 export const getters = {
   getDomainInfo: (state) => (domainName, infoAsked) => {
-    /* 
-    if (!infoAsked || infoAsked == undefined || infoAsked == void 0)
-      infoAsked = 'name' */
     let domains = state.allDomains
     for (let i = 0; i < domains.length; i++) {
       if (domains[i].name.includes(domainName)) {

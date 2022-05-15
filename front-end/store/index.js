@@ -18,6 +18,9 @@ export const mutations = {
     state.user.isAuthenticated = false
     this.$cookies.removeAll()
   },
+  onAuthenticated(state) {
+    state.user.isAuthenticated = true
+  },
 }
 
 //actions are async calls to 3rd party
@@ -32,12 +35,16 @@ export const actions = {
   async getPing(context) {
     let access_token = this.$cookies.get('jwt-access')
     this.$axios.setToken(access_token, 'Bearer')
-    let users = []
+    let ping = []
     try {
-      users = await this.$axios.$get('/users/')
+      ping = await this.$axios.$get('/domains/1')
     } catch (error) {
-      return 401
+      if (error.toString().includes('status code 404')) {
+        context.commit('onAuthenticated')
+        return 404
+      } else return 401
     }
+    context.commit('onAuthenticated')
     return 200
   },
 }

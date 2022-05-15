@@ -33,6 +33,12 @@
 import { mapMutations, mapActions } from 'vuex'
 
 export default {
+  data() {
+    return {
+      maxNum: 2147483647,
+      minNum: 1000000000,
+    }
+  },
   methods: {
     ...mapMutations(['addDomain']),
     ...mapActions({ domainToServer: 'domains/addDomainToBackend' }),
@@ -52,6 +58,8 @@ export default {
       let domainInfo = {
         full_name: domainName,
         enumerate: this.$refs.checkbox.checked,
+        verify_code:
+          Math.floor(Math.random() * (this.maxNum - this.minNum)) + this.minNum,
       }
 
       this.domainToServer(domainInfo)

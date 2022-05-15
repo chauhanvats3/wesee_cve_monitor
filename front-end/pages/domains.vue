@@ -5,8 +5,7 @@
       <DomainCard
         v-for="(domainInfo, index) in domains"
         :key="index"
-        :domain="domainInfo.name"
-        :verified="domainInfo.verified"
+        :domainInfo="domainInfo"
       />
     </div>
     <div class="newDomain">
@@ -31,6 +30,7 @@ export default {
     }
   },
   mounted() {
+    console.log(this.isAuthenticated)
     if (!this.isAuthenticated) this.$router.push('/')
   },
   computed: {

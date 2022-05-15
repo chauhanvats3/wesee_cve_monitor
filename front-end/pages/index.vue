@@ -36,12 +36,16 @@ export default {
     }
   }, */,
   async asyncData(context) {
-    if (!context.store.state.user.isAuthenticated) {
+    /*    if (!context.store.state.user.isAuthenticated) {
       context.store.dispatch('destroyTokens')
       return 401
-    }
-    let status = await context.store.dispatch('getPing')
-    if (status == 200) {
+    } */
+    console.log('started')
+    let status
+    status = await context.store.dispatch('getPing')
+    console.log(status)
+
+    if (status == 200 || status == 404) {
       context.app.router.push('/domains')
     }
   },

@@ -35,6 +35,7 @@ class Domain(models.Model):
     enumerate = models.BooleanField(default=False)
     subdomains = models.ManyToManyField(Subdomain, blank=True)
     techs = models.ManyToManyField(Tech)
+    verify_code = models.PositiveIntegerField()
 
     @property
     def name(self):
