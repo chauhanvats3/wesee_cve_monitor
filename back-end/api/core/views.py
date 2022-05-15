@@ -36,8 +36,7 @@ class DomainViewSet(viewsets.ModelViewSet):
         verificationNumber = struct["fields"]["verify_code"]
         name = fullName.split("://")[1]
         isVerified = verifyDomain(name, verificationNumber)
-        JsonData = json.dumps(struct, indent=4)
-        return HttpResponse(JsonData)
+        return HttpResponse(isVerified)
         # return Response(thisDomain)
 
 

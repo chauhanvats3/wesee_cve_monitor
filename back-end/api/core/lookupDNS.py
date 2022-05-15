@@ -2,12 +2,13 @@ import dns.resolver
 
 
 def verifyDomain(domainName, verifyCode):
-    verificationText = "we-see-verification." + domainName + "=" + verifyCode
+    verificationText = "we-see-verification." + domainName + "=" + str(verifyCode)
     try:
-        answers = dns.resolver.resolve(domainName, "TXT")
+        answers = dns.resolver.resolve(domainName, "txt")
     except:
         return "Some Error Occurred"
     for rdata in answers:
-        if rdata == verificationText:
-            return True
+        print(rdata)
+        # if rdata == verificationText:
+        #     return True
     return False
