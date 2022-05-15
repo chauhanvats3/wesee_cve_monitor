@@ -1,15 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from .views import DomainViewSet,SubdomainViewSet,TechViewSet,CVEViewSet, UserViewSet
+from .views import DomainViewSet, SubdomainViewSet, TechViewSet, CVEViewSet, UserViewSet
 
 router = DefaultRouter()
-router.register('domains', DomainViewSet)
-router.register('subdomains', SubdomainViewSet)
-router.register('techs', TechViewSet)
-router.register('cves', CVEViewSet)
-router.register('users', UserViewSet)
+router.register(r"domains", DomainViewSet)
+router.register(r"subdomains", SubdomainViewSet)
+router.register(r"techs", TechViewSet)
+router.register(r"cves", CVEViewSet)
+router.register(r"users", UserViewSet)
 
-urlpatterns = [
-    path("", include(router.urls))
-]
+urlpatterns = [path("", include(router.urls))]

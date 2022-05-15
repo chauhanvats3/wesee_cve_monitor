@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "269d166b73dbce01774f5221ac1bf5fe03965919d214bcbebb3927b21eaa99c2"
+            "sha256": "18797d6c50d3e68433560447c68bc83b152f5794af165394b094ef149ae1d2f1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -34,11 +34,11 @@
         },
         "django-cors-headers": {
             "hashes": [
-                "sha256:a22be2befd4069c4fc174f11cf067351df5c061a3a5f94a01650b4e928b0372b",
-                "sha256:eb98389bf7a2afc5d374806af4a9149697e3a6955b5a2dc2bf049f7d33647456"
+                "sha256:39d1d5acb872c1860ecfd88b8572bfbb3a1f201b5685ede951d71fc57c7dfae5",
+                "sha256:5f07e2ff8a95c887698e748588a4a0b2ad0ad1b5a292e2d33132f1253e2a97cb"
             ],
             "index": "pypi",
-            "version": "==3.11.0"
+            "version": "==3.12.0"
         },
         "django-rest-framework": {
             "hashes": [
@@ -54,6 +54,14 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==3.13.1"
+        },
+        "dnspython": {
+            "hashes": [
+                "sha256:0f7569a4a6ff151958b64304071d370daa3243d15941a7beedf0c9fe5105603e",
+                "sha256:a851e51367fb93e9e1361732c1d60dab63eff98712e503ea7d92e6eccb109b4f"
+            ],
+            "index": "pypi",
+            "version": "==2.2.1"
         },
         "pytz": {
             "hashes": [
