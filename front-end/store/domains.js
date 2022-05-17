@@ -66,6 +66,22 @@ export const actions = {
       return 200
     }
   },
+  async verifyDomain(context, domainInfo) {
+    let access_token = this.$cookies.get('jwt-access')
+    if (access_token) {
+      this.$axios.setToken(access_token, 'Bearer')
+      try {
+        let status = await this.$axios.$post(
+          '/domains/' + domainInfo.id + '/verify/'
+        )
+        console.log(status)
+        return status
+      } catch (error) {
+        return error
+      }
+      return 200
+    }
+  },
   async deleteDomainFromBackend(context, domainName) {
     let domainId = context.getters.getDomainInfo(domainName, 'id')
     let access_token = this.$cookies.get('jwt-access')

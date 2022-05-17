@@ -10,7 +10,6 @@ class DomainSerializer(serializers.ModelSerializer):
         model = Domain
         fields = "__all__"
         depth = 5
-        read_only_fields = ("verified",)
 
 
 class SubdomainSerializer(serializers.ModelSerializer):

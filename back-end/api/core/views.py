@@ -1,11 +1,13 @@
+from crypt import methods
+import imp
 import json
-from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.core import serializers
 from .lookupDNS import verifyDomain
+from .searchSubdomains import findSubdomains
 from .serializers import (
     DomainSerializer,
     SubdomainSerializer,
@@ -30,14 +32,40 @@ class DomainViewSet(viewsets.ModelViewSet):
                 thisDomain,
             ],
         )
-
+        print(thisObject)
         struct = json.loads(thisObject)[0]
         fullName = struct["fields"]["full_name"]
         verificationNumber = struct["fields"]["verify_code"]
         name = fullName.split("://")[1]
         isVerified = verifyDomain(name, verificationNumber)
-        return HttpResponse(isVerified)
-        # return Response(thisDomain)
+        if isVerified:
+            data_to_change = {"verified": "true"}
+        else:
+            return Response({"status": 400, "error": "Could Not Verify"})
+        # Partial update of the data
+        serializer = DomainSerializer(thisDomain, data=data_to_change, partial=True)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["post"])
+    def enumSubdomains(self, request, pk):
+        thisDomain = self.get_object()
+        thisObject = serializers.serialize(
+            "json",
+            [
+                thisDomain,
+            ],
+        )
+        print(thisObject)
+        struct = json.loads(thisObject)[0]
+        fullName = struct["fields"]["full_name"]
+        name = fullName.split("://")[1]
+        jawab = findSubdomains(name)
+        for subdomain in jawab["FDNS_A"]:
+            print(subdomain)
+        return Response(jawab["FDNS_A"])
 
 
 class SubdomainViewSet(viewsets.ModelViewSet):

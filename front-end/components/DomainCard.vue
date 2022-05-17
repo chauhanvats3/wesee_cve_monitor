@@ -27,7 +27,7 @@
       <div class="cta" v-if="domainInfo.verified == true" ref="cta">
         <div class="btn verified">Verified</div>
         <div class="btn dashboard">
-          <NuxtLink :to="'/dashboard/' + domain">Dashboard</NuxtLink>
+          <NuxtLink :to="'/dashboard/' + domainInfo.name">Dashboard</NuxtLink>
         </div>
         <div class="btn delete" @click="deleteClicked">Delete</div>
         <p>I want to DELETE this domain</p>
@@ -51,14 +51,12 @@
         <p>3. Press “verify" after a while</p>
       </div>
       <div class="bottom-row">
-        <div class="verification-code">
+        <div class="verification-code" ref="verifyCode">
           <p>
-            we-see-verification.{{ domainInfo.name }}={{
-              domainInfo.verify_code
-            }}
+            {{ verificationText }}
           </p>
         </div>
-        <div class="btn verify-now">
+        <div class="btn verify-now" @click="verifyDomain">
           <p>verify</p>
         </div>
       </div>
@@ -69,20 +67,28 @@
 </template>
 
 <script>
+import { CodeNode } from 'source-list-map'
 import { mapActions } from 'vuex'
 
 export default {
   props: ['domainInfo'],
   data() {
-    return {}
+    return {
+      verificationText: `we-see-verification.${this.domainInfo.name}=${this.domainInfo.verify_code}`,
+    }
   },
   methods: {
-    ...mapActions({ deleteThisDomain: 'domains/deleteDomainFromBackend' }),
+    ...mapActions({
+      deleteThisDomain: 'domains/deleteDomainFromBackend',
+      verifyThisDomain: 'domains/verifyDomain',
+    }),
     openVerifyInstructions() {
       this.$refs.verifyOverlay.classList.toggle('show')
     },
     closeVerifyInstructions() {
       this.$refs.verifyOverlay.classList.toggle('show')
+      this.$refs.verifyCode.classList.remove('not-verified')
+      this.$refs.verifyCode.children[0].innerText = this.verificationText
     },
     deleteClicked() {
       if (this.$refs.cta.children[2].innerText == 'Yes') {
@@ -110,6 +116,14 @@ export default {
     async deleteDomain() {
       let status = await this.deleteThisDomain(this.domainInfo.name)
       console.log(status)
+    },
+    async verifyDomain() {
+      let status = await this.verifyThisDomain(this.domainInfo)
+      console.log(status)
+      if (status.status == 400) {
+        this.$refs.verifyCode.classList.add('not-verified')
+        this.$refs.verifyCode.children[0].innerText = status.error
+      }
     },
   },
 }
@@ -278,6 +292,7 @@ $top-row-height : 50px
             justify-content: space-evenly
             width: 100%
             .verification-code
+              @include flexify
               max-width: 80%
               height: 100%
               overflow-x: scroll
@@ -285,11 +300,17 @@ $top-row-height : 50px
               background: white
               border-radius: 10px
               padding: 10px
-              @include flexify
               justify-content: flex-start
+              flex-grow: 1
+              transition: all 0.3s ease-in
               p
                 white-space: nowrap
 
+              &.not-verified
+               background: $red
+               justify-content: center
+               p
+                 color: white
 
             .btn
               font-size: 0.8rem

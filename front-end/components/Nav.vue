@@ -7,7 +7,7 @@
     <div class="menu" v-if="$route.name != 'index'">
       <NuxtLink to="/domains">Domains</NuxtLink>
       <NuxtLink to="/dashboard">Dashboard</NuxtLink>
-      <a style="cursor: pointer" @click="logout">Log Out</a>
+      <a style="cursor: pointer" @click="logout">Logout</a>
       <!-- 
       <NuxtLink to="/user" @click="destroyTokens">Logout</NuxtLink> -->
     </div>

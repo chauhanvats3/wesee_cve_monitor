@@ -8,7 +8,7 @@ def verifyDomain(domainName, verifyCode):
     except:
         return "Some Error Occurred"
     for rdata in answers:
-        print(rdata)
-        # if rdata == verificationText:
-        #     return True
+        strData = str(rdata).strip('"')
+        if verificationText == strData:
+            return True
     return False
