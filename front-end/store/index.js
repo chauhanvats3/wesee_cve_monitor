@@ -16,7 +16,9 @@ export const mutations = {
 
   destroyTokens(state) {
     state.user.isAuthenticated = false
-    this.$cookies.removeAll()
+
+    this.$cookies.set('jwt-access', null, { sameSite: true })
+    this.$cookies.set('jwt-refresh', null, { sameSite: true })
   },
   onAuthenticated(state) {
     state.user.isAuthenticated = true

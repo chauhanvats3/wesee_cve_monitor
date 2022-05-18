@@ -1,29 +1,7 @@
 from rest_framework import serializers
+from drf_writable_nested.serializers import WritableNestedModelSerializer
+
 from .models import Domain, Subdomain, Tech, CVE, User
-
-
-class DomainSerializer(serializers.ModelSerializer):
-    name = serializers.ReadOnlyField()
-    protocol = serializers.ReadOnlyField()
-
-    class Meta:
-        model = Domain
-        fields = "__all__"
-        depth = 5
-
-
-class SubdomainSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Subdomain
-        fields = "__all__"
-        depth = 3
-
-
-class TechSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tech
-        fields = "__all__"
-        depth = 3
 
 
 class CVESerializer(serializers.ModelSerializer):
@@ -31,6 +9,36 @@ class CVESerializer(serializers.ModelSerializer):
         model = CVE
         fields = "__all__"
         depth = 1
+
+
+class TechSerializer(WritableNestedModelSerializer):
+    cves = CVESerializer(many=True)
+
+    class Meta:
+        model = Tech
+        fields = "__all__"
+        depth = 3
+
+
+class SubdomainSerializer(WritableNestedModelSerializer):
+    techs = TechSerializer(many=True)
+
+    class Meta:
+        model = Subdomain
+        fields = "__all__"
+        depth = 3
+
+
+class DomainSerializer(WritableNestedModelSerializer):
+    name = serializers.ReadOnlyField()
+    protocol = serializers.ReadOnlyField()
+    subdomains = SubdomainSerializer(many=True)
+    techs = TechSerializer(many=True)
+
+    class Meta:
+        model = Domain
+        fields = "__all__"
+        depth = 5
 
 
 class UserSerializer(serializers.ModelSerializer):

@@ -65,22 +65,14 @@ export default {
     }
   },
   async asyncData(context) {
-    if (!context.store.state.user.isAuthenticated) {
-      context.app.router.push('/')
-      return 401
-    }
     const slug = context.params.slug
     let status = await context.store.dispatch('domains/getDomainsFromBackend')
-    if (status != 200) {
+    if (status == 401) {
       context.app.router.push('/')
     }
     return { slug, status }
   },
   mounted() {
-    if (!this.isAuthenticated || this.isAuthenticated == undefined) {
-      this.$router.push('/')
-    }
-
     this.enumSubdomains = this.domainInfo(this.slug).enumerate
     this.getExcluded(this.slug)
   },
