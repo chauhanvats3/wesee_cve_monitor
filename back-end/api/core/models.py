@@ -1,7 +1,7 @@
-from email.policy import default
-from enum import unique
-from tokenize import blank_re
+import random
 from django.db import models
+
+from .getTechs import getTechs
 
 # Create your models here.
 
@@ -30,6 +30,28 @@ class Subdomain(models.Model):
     name = models.CharField(max_length=50)
     include = models.BooleanField(default=True)
     techs = models.ManyToManyField(Tech)
+
+    """ def save(self, *args, **kwargs):
+        response = getTechs(self.name)
+        techs_to_add = []
+        try:
+            response = response[0]["technologies"]
+        except:
+            print("No Technologies Found!")
+
+        for tech in response:
+            randColor = "%06x" % random.randint(0, 0xFFFFFF)
+            techs_to_add.append(
+                {
+                    "name": tech["name"],
+                    "versions": {"arr": tech["versions"]},
+                    "cves": [],
+                    "color": randColor,
+                }
+            )
+        self.techs.set(techs_to_add)
+        print(self)
+        super(models.Model, self).save(*args, **kwargs) """
 
     def __str__(self):
         return "%s" % (self.name)

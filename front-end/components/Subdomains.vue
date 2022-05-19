@@ -8,9 +8,14 @@
       <div class="wrapper" v-if="subdomain.include">
         <div class="top-bar">
           <h3>{{ subdomain.name }}</h3>
-          <p class="exclude" @click.stop="toggleExclusion(subdomain.name)">
-            exclude
-          </p>
+          <div class="options">
+            <p class="getTech" @click.stop="getSubdomainTechs(subdomain.id)">
+              get techs
+            </p>
+            <p class="exclude" @click.stop="toggleExclusion(subdomain.name)">
+              exclude
+            </p>
+          </div>
         </div>
         <div class="techs">
           <TechPill
@@ -28,7 +33,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 export default {
   props: ['domain'],
@@ -37,6 +42,7 @@ export default {
   },
   methods: {
     ...mapMutations({ excludeToggle: 'domains/excludeToggle' }),
+    ...mapActions({ getTechs: 'domains/getTechs' }),
     subPillClicked(info) {
       this.$emit('sub-pill-clicked', info)
     },
@@ -46,6 +52,9 @@ export default {
         subdomain,
       }
       this.excludeToggle(info)
+    },
+    getSubdomainTechs(id) {
+      this.getTechs(id)
     },
   },
 }
@@ -59,10 +68,19 @@ export default {
         .top-bar
             @include flexify-row
             justify-content: space-between
-            .exclude
-                color: $red
+            .options
+              @include flexify-row
+              .getTech,.exclude
                 font-size: 0.75rem
                 cursor: pointer
+                margin: 5px 10px
+
+              .getTech
+                  color: $main-color
+
+              .exclude
+                  color: $red
         .techs
             @include flexify-row
+            flex-wrap: wrap
 </style>

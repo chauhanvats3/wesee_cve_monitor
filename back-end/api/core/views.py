@@ -112,16 +112,16 @@ class SubdomainViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def findTech(self, request, pk):
-        thisDomain = self.get_object()
+        thisSubdomain = self.get_object()
         thisObject = serializers.serialize(
             "json",
             [
-                thisDomain,
+                thisSubdomain,
             ],
         )
         struct = json.loads(thisObject)[0]
-        fullName = struct["fields"]["name"]
-        response = getTechs(fullName)
+        subDomain = struct["fields"]["name"]
+        response = getTechs(subDomain)
         techs = []
         for tech in response[0]["technologies"]:
             randColor = "%06x" % random.randint(0, 0xFFFFFF)
@@ -134,7 +134,9 @@ class SubdomainViewSet(viewsets.ModelViewSet):
                 }
             )
         data_to_change = {"techs": techs}
-        serializer = DomainSerializer(thisDomain, data=data_to_change, partial=True)
+        serializer = SubdomainSerializer(
+            thisSubdomain, data=data_to_change, partial=True
+        )
         if serializer.is_valid():
             self.perform_update(serializer)
         return Response(data_to_change)

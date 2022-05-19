@@ -143,7 +143,9 @@ export const actions = {
       return 200
     }
   },
-  async getTechs(context, info) {},
+  async getTechs(context, id) {
+    let techRes = await this.$axios.$post(`/subdomains/${id}/findTech/`)
+  },
 }
 
 export const getters = {
