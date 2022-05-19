@@ -74,7 +74,8 @@ export default {
     }
     return { slug, status }
   },
-  mounted() {
+  async mounted() {
+    let status = await this.$store.dispatch('domains/getDomainsFromBackend')
     this.enumSubdomains = this.domainInfo(this.slug).enumerate
     this.getExcluded(this.slug)
   },
@@ -85,7 +86,8 @@ export default {
       getExcluded: 'domains/getExcludedSubdomains',
     }),
     thisDomain() {
-      return this.domainInfo(this.slug)
+      let info = this.domainInfo(this.slug)
+      return info
     },
     excludedExist() {
       let excludedSubdomains = this.getExcluded(this.slug)
@@ -110,7 +112,6 @@ export default {
     },
     addSubdomain() {
       let name = this.newSubdomainName.split('://').pop()
-      console.log(typeof name)
       if (name.search(this.slug) == -1) name = name + '.' + this.slug
 
       this.subdomainToBackend({

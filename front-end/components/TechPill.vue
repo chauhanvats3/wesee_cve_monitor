@@ -3,7 +3,7 @@
     <p :style="{ background: bgColors[2], color: bgColors[0] }">
       {{ tech.name }}
     </p>
-    <p :style="{ background: bgColors[1] }">{{ tech.version }}</p>
+    <p :style="{ background: bgColors[1] }">{{ techVersion }}</p>
     <p :style="{ background: bgColors[0], color: bgColors[2] }">
       {{ tech.cves.length }}
     </p>
@@ -20,8 +20,12 @@ export default {
   },
   computed: {
     bgColors() {
-      let color = this.tech.color
-      let hslValues = this.$generatePalette(color)
+      // let randColor = (
+      //   Math.floor(Math.random() * (999999 - 100000)) + 100000
+      // ).toString()
+      //this.tech.color = randColor
+      //console.log(Math.floor(Math.random() * (999999 - 100000)) + 100000)
+      let hslValues = this.$generatePalette(this.tech.color)
       let bg = []
       for (let i = 0; i < hslValues.length; i++) {
         bg[
@@ -29,6 +33,12 @@ export default {
         ] = `hsl(${hslValues[i][0]}deg, ${hslValues[i][1]}%,${hslValues[i][2]}%, ${hslValues[i][3]})`
       }
       return bg
+    },
+    techVersion() {
+      let versions = this.tech.versions.arr
+      if (versions.length == 0) return 'NA'
+      if (versions.length > 1) return 'multiple'
+      return versions[0]
     },
   },
 }
@@ -39,6 +49,7 @@ export default {
     @include flexify-row
     margin: 0 10px
     cursor: pointer
+
     p
         margin: 20px 0px
         color: white

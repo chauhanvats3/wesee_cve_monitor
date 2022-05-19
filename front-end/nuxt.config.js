@@ -54,7 +54,11 @@ export default {
   },
 
   styleResources: {
-    scss: ['~assets/scss/mixins.scss', '~assets/scss/variables.scss'],
+    scss: [
+      '~assets/scss/mixins.scss',
+      '~assets/scss/variables.scss',
+      '~assets/scss/brands.scss',
+    ],
     sass: ['~assets/sass/mixins.sass', '~assets/sass/variables.sass'],
   },
 }

@@ -1,5 +1,5 @@
 from crypt import methods
-import imp
+import random
 import json
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -89,11 +89,13 @@ class DomainViewSet(viewsets.ModelViewSet):
         response = getTechs(fullName)
         techs = []
         for tech in response[0]["technologies"]:
+            randColor = "%06x" % random.randint(0, 0xFFFFFF)
             techs.append(
                 {
                     "name": tech["name"],
                     "versions": {"arr": tech["versions"]},
                     "cves": [],
+                    "color": randColor,
                 }
             )
         data_to_change = {"techs": techs}
@@ -107,6 +109,35 @@ class SubdomainViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = SubdomainSerializer
     queryset = Subdomain.objects.all()
+
+    @action(detail=True, methods=["post"])
+    def findTech(self, request, pk):
+        thisDomain = self.get_object()
+        thisObject = serializers.serialize(
+            "json",
+            [
+                thisDomain,
+            ],
+        )
+        struct = json.loads(thisObject)[0]
+        fullName = struct["fields"]["name"]
+        response = getTechs(fullName)
+        techs = []
+        for tech in response[0]["technologies"]:
+            randColor = "%06x" % random.randint(0, 0xFFFFFF)
+            techs.append(
+                {
+                    "name": tech["name"],
+                    "versions": {"arr": tech["versions"]},
+                    "cves": [],
+                    "color": randColor,
+                }
+            )
+        data_to_change = {"techs": techs}
+        serializer = DomainSerializer(thisDomain, data=data_to_change, partial=True)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+        return Response(data_to_change)
 
 
 class TechViewSet(viewsets.ModelViewSet):

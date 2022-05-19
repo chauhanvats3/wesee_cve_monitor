@@ -64,7 +64,6 @@ export const actions = {
     let access_token = this.$cookies.get('jwt-access')
     if (access_token) {
       this.$axios.setToken(access_token, 'Bearer')
-      console.log(domainInfo)
       try {
         let status = await this.$axios.$post('/domains/', domainInfo)
         domainInfo.id = status.id
@@ -72,7 +71,8 @@ export const actions = {
         let enumRes = await this.$axios.$post(
           `/domains/${status.id}/enumSubdomains/`
         )
-        console.log(enumRes)
+
+        let techRes = await this.$axios.$post(`/domains/${status.id}/findTech/`)
       } catch (error) {
         return error
       }
