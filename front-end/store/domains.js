@@ -37,6 +37,14 @@ export const mutations = {
     }
     state.allDomains = domains
   },
+  addSubdomain(state, info) {
+    let domains = state.allDomains
+    for (let i = 0; i < domains.length; i++) {
+      if (domains[i].id == info.id) {
+        domains[i].subdomains.push(info.subdomain)
+      }
+    }
+  },
 }
 
 export const actions = {
@@ -56,10 +64,15 @@ export const actions = {
     let access_token = this.$cookies.get('jwt-access')
     if (access_token) {
       this.$axios.setToken(access_token, 'Bearer')
+      console.log(domainInfo)
       try {
         let status = await this.$axios.$post('/domains/', domainInfo)
         domainInfo.id = status.id
         context.commit('addDomain', domainInfo)
+        let enumRes = await this.$axios.$post(
+          `/domains/${status.id}/enumSubdomains/`
+        )
+        console.log(enumRes)
       } catch (error) {
         return error
       }
@@ -74,12 +87,10 @@ export const actions = {
         let status = await this.$axios.$post(
           '/domains/' + domainInfo.id + '/verify/'
         )
-        console.log(status)
         return status
       } catch (error) {
         return error
       }
-      return 200
     }
   },
   async deleteDomainFromBackend(context, domainName) {
@@ -96,6 +107,43 @@ export const actions = {
       return 200
     }
   },
+  async addSubdomainToBackend(context, info) {
+    let domainId = context.getters.getDomainInfo(info.domainName, 'id')
+    let oldSubdomains = context.getters.getDomainInfo(
+      info.domainName,
+      'subdomains'
+    )
+    oldSubdomains = JSON.parse(JSON.stringify(oldSubdomains))
+    let updateData = {
+      subdomains: [
+        ...oldSubdomains,
+        {
+          name: info.subdomainName,
+          include: info.include,
+          techs: [],
+        },
+      ],
+    }
+
+    let access_token = this.$cookies.get('jwt-access')
+    if (access_token) {
+      this.$axios.setToken(access_token, 'Bearer')
+      try {
+        let response = await this.$axios.$patch(
+          '/domains/' + domainId + '/',
+          updateData
+        )
+        context.commit('addSubdomain', {
+          id: domainId,
+          subdomain: response.subdomains.pop(),
+        })
+      } catch (error) {
+        return error
+      }
+      return 200
+    }
+  },
+  async getTechs(context, info) {},
 }
 
 export const getters = {
@@ -103,7 +151,7 @@ export const getters = {
     let domains = state.allDomains
     for (let i = 0; i < domains.length; i++) {
       if (domains[i].name.includes(domainName)) {
-        if (!infoAsked || infoAsked == undefined || infoAsked == void 0) {
+        if (!infoAsked || infoAsked == undefined) {
           return domains[i]
         } else return domains[i][`${infoAsked}`]
       }
