@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.core import serializers
 from .lookupDNS import verifyDomain
 from .searchSubdomains import findSubdomains
+from .getTechs import getTechs
 from .serializers import (
     DomainSerializer,
     SubdomainSerializer,
@@ -63,9 +64,43 @@ class DomainViewSet(viewsets.ModelViewSet):
         fullName = struct["fields"]["full_name"]
         name = fullName.split("://")[1]
         jawab = findSubdomains(name)
+        newSubdomains = []
         for subdomain in jawab["FDNS_A"]:
-            print(subdomain)
-        return Response(jawab["FDNS_A"])
+            useful = subdomain.split(",")[1]
+            print(useful)
+            newSubdomains.append({"techs": [], "name": useful, "include": "true"})
+        data_to_change = {"subdomains": newSubdomains}
+        serializer = DomainSerializer(thisDomain, data=data_to_change, partial=True)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["post"])
+    def findTech(self, request, pk):
+        thisDomain = self.get_object()
+        thisObject = serializers.serialize(
+            "json",
+            [
+                thisDomain,
+            ],
+        )
+        struct = json.loads(thisObject)[0]
+        fullName = struct["fields"]["full_name"]
+        response = getTechs(fullName)
+        techs = []
+        for tech in response[0]["technologies"]:
+            techs.append(
+                {
+                    "name": tech["name"],
+                    "versions": {"arr": tech["versions"]},
+                    "cves": [],
+                }
+            )
+        data_to_change = {"techs": techs}
+        serializer = DomainSerializer(thisDomain, data=data_to_change, partial=True)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+        return Response(data_to_change)
 
 
 class SubdomainViewSet(viewsets.ModelViewSet):

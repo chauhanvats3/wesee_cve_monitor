@@ -30,15 +30,16 @@
           Enumerate Subdomains?
         </p>
       </div>
-      <div class="addDomain">
+      <div class="addSubDomain">
         <input
           type="text"
           name="subdomain"
           id="subDomainTxt"
           ref="newSubdomain"
           placeholder="https://"
+          v-model="newSubdomainName"
         />
-        <div class="btn add-subdomain">
+        <div class="btn add-subdomain" @click="addSubdomain">
           <p>Add Subdomain</p>
         </div>
       </div>
@@ -53,7 +54,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   data() {
@@ -62,6 +63,7 @@ export default {
       techToOpen: {},
       enumSubdomains: false,
       excludedSubdomainsExist: false,
+      newSubdomainName: '',
     }
   },
   async asyncData(context) {
@@ -91,6 +93,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions({ subdomainToBackend: 'domains/addSubdomainToBackend' }),
     openTechDetails(tech) {
       this.techToOpen = tech
       this.$refs.techModalWrapper.classList.add('show')
@@ -105,15 +108,18 @@ export default {
     checkBoxClick() {
       this.enumSubdomains = !this.enumSubdomains
     },
-    getExcludedSubdomains() {},
-    /*  addNewSubdomain() {
-      let info = {
-        domain: this.slug,
-        subdomain: this.$refs.newSubdomain[0].value,
-      }
-      this.addSubdomain(info)
-      this.$refs.newSubdomain[0].value = ''
-    }, */
+    addSubdomain() {
+      let name = this.newSubdomainName.split('://').pop()
+      console.log(typeof name)
+      if (name.search(this.slug) == -1) name = name + '.' + this.slug
+
+      this.subdomainToBackend({
+        domainName: this.slug,
+        subdomainName: name,
+        include: true,
+      })
+      this.newSubdomainName = ''
+    },
   },
 }
 </script>
@@ -165,7 +171,7 @@ export default {
         height: 30px
       p
         font-size: 1rem
-    .addDomain
+    .addSubDomain
       padding: 0 20px
       @include flexify-row
       width: 100%

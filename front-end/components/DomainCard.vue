@@ -45,7 +45,7 @@
       <div class="content">
         <p>1. Sign In to your DNS provider</p>
         <p>
-          2. Copy the text record below into the DNS configuration for
+          2. Create a TXT record with below mentioned value for
           <span>{{ domainInfo.name }}</span>
         </p>
         <p>3. Press “verify" after a while</p>

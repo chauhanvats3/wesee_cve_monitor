@@ -1,4 +1,6 @@
+from email.policy import default
 from enum import unique
+from tokenize import blank_re
 from django.db import models
 
 # Create your models here.
@@ -12,20 +14,20 @@ class CVE(models.Model):
 
 
 class Tech(models.Model):
+    def json_default():
+        return {"arr": []}
+
     name = models.CharField(max_length=100)
-    version = models.CharField(max_length=50)
-    cves = models.ManyToManyField(CVE)
+    versions = models.JSONField(default=json_default)
+    cves = models.ManyToManyField(CVE, blank=True)
     color = models.CharField(max_length=6, default="828192")
 
-    class Meta:
-        unique_together = ["name", "version"]
-
     def __str__(self):
-        return "%s [%s]" % (self.name, self.version)
+        return "%s" % (self.name)
 
 
 class Subdomain(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     include = models.BooleanField(default=True)
     techs = models.ManyToManyField(Tech)
 
