@@ -9,7 +9,11 @@
         <div class="top-bar">
           <h3>{{ subdomain.name }}</h3>
           <div class="options">
-            <p class="getTech" @click.stop="getSubdomainTechs(subdomain.id)">
+            <p
+              class="getTech"
+              @click.stop="getSubdomainTechs(subdomain.id)"
+              v-if="false"
+            >
               get techs
             </p>
             <p class="exclude" @click.stop="toggleExclusion(subdomain.name)">
@@ -37,6 +41,14 @@ import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 export default {
   props: ['domain'],
+  mounted() {
+    let subdomainsListed = this.getSubdomains(this.domain)
+    for (let i = 0; i < subdomainsListed.length; i++) {
+      if (subdomainsListed[i].techs.length == 0) {
+        this.getSubdomainTechs(subdomainsListed[i].id)
+      }
+    }
+  },
   computed: {
     ...mapGetters('domains', ['getSubdomains']),
   },
@@ -73,7 +85,7 @@ export default {
               .getTech,.exclude
                 font-size: 0.75rem
                 cursor: pointer
-                margin: 5px 10px
+                margin: 5px 15px
 
               .getTech
                   color: $main-color

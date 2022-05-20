@@ -26,18 +26,11 @@ export default {
   computed: {
     ...mapGetters({ domains: 'domains/getAllDomains' }),
   },
-  mounted() {
-    if (!this.isAuthenticated) this.$router.push('/')
-  },
   async asyncData(context) {
-    let status
-    status = await context.store.dispatch('getPing')
-
-    if (status == 401) {
+    let status = await context.store.dispatch('domains/getDomainsFromBackend')
+    if (status != 200) {
       context.app.router.push('/')
     }
-
-    await context.store.dispatch('domains/getDomainsFromBackend')
   },
 }
 </script>

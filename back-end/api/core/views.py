@@ -1,6 +1,7 @@
 from crypt import methods
 import random
 import json
+from .getPhoto import getPhoto
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -107,6 +108,27 @@ class DomainViewSet(viewsets.ModelViewSet):
             self.perform_update(serializer)
         return Response(data_to_change)
 
+    @action(detail=True, methods=["post"])
+    def getPhoto(self, request, pk):
+        thisDomain = self.get_object()
+        thisObject = serializers.serialize(
+            "json",
+            [
+                thisDomain,
+            ],
+        )
+        print(thisObject)
+        struct = json.loads(thisObject)[0]
+        fullName = struct["fields"]["full_name"]
+        verificationNumber = struct["fields"]["verify_code"]
+        name = fullName.split("://")[1]
+        photoUrl = getPhoto()
+        data_to_change = {"photo": photoUrl}
+        serializer = DomainSerializer(thisDomain, data=data_to_change, partial=True)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+        return Response(serializer.data)
+
 
 class SubdomainViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
@@ -142,7 +164,7 @@ class SubdomainViewSet(viewsets.ModelViewSet):
         )
         if serializer.is_valid():
             self.perform_update(serializer)
-        return Response(data_to_change)
+        return Response(serializer.data)
 
 
 class TechViewSet(viewsets.ModelViewSet):

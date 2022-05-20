@@ -55,15 +55,11 @@ export default (context, inject) => {
     let rgb = hexToRgb(color)
     let hsl = rgbToHsl(rgb)
     let palette = []
-    if (hsl[1] >= hsl[2]) {
-      //If Color is Dark
-      for (let i = 0; i < 3; i++)
-        palette[i] = [hsl[0], hsl[1], (hsl[2] + i * 18.5) % 100, hsl[3]]
-    } else {
-      //If Color is light
-      for (let i = 0, j = 2; i < 3; i++, j--)
-        palette[j] = [hsl[0], hsl[1], (hsl[2] - i * 18.5) % 100, hsl[3]]
-    }
+
+    let inc = 18.5
+    palette[0] = [hsl[0], hsl[1], (hsl[2] - inc) % 100, hsl[3]]
+    palette[1] = [hsl[0], hsl[1], hsl[2] % 100, hsl[3]]
+    palette[2] = [hsl[0], hsl[1], (hsl[2] + inc) % 100, hsl[3]]
     return palette
   }
 

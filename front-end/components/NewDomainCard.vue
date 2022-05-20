@@ -64,8 +64,8 @@ export default {
         techs: [],
       }
 
-      this.domainToServer(domainInfo)
-
+      let status = this.domainToServer(domainInfo)
+      console.log(status)
       this.$refs.domainInput.value = ''
     },
   },

@@ -4,11 +4,9 @@
       <p :style="{ background: bgColors[2], color: bgColors[0] }">
         {{ tech.name }}
       </p>
-      <p :style="{ background: bgColors[1] }">
-        {{ tech.ver }}
-        <span style="color: #f1f1f1; cursor: pointer; margin: 0 10px"
-          >edit</span
-        >
+      <p :style="{ background: bgColors[1], color: bgColors[0] }">
+        {{ techVersion }}
+        <span class="edit">edit</span>
       </p>
       <p :style="{ background: bgColors[0], color: bgColors[2] }">
         {{ tech.cves.length }} CVEs Found
@@ -39,6 +37,12 @@ export default {
       }
       return bg
     },
+    techVersion() {
+      let versions = this.tech.versions.arr
+      if (versions.length == 0) return 'NA'
+      if (versions.length > 1) return 'multiple'
+      return versions[0]
+    },
   },
 }
 </script>
@@ -63,6 +67,15 @@ export default {
       border-bottom-right-radius: 10px
       border-top-right-radius: 10px
       @include flexify-row
+      position: relative
+      .edit
+        color: #f1f1f1
+        cursor: pointer
+        margin: 0 20px 0 10px
+        font-size: 16px
+        position: absolute
+        right: 0
+
     p:nth-child(1)
         margin-right: -20px
         border-top-left-radius: 10px

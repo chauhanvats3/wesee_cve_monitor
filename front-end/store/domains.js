@@ -20,12 +20,9 @@ export const mutations = {
     state.allDomains = data
   },
   addDomain(state, domainInfo) {
-    let domain = {}
-    domain.full_name = domainInfo.full_name
+    let domain = { ...domainInfo }
     domain.name = domainInfo.full_name.split('://')[1]
     domain.verified = false
-    domain.enumerate = domainInfo.enumerate
-    domain.verify_code = domainInfo.verify_code
     state.allDomains.push(domain)
   },
   removeDomain(state, domainId) {
@@ -42,6 +39,18 @@ export const mutations = {
     for (let i = 0; i < domains.length; i++) {
       if (domains[i].id == info.id) {
         domains[i].subdomains.push(info.subdomain)
+      }
+    }
+  },
+  addSubdomainTechs(state, info) {
+    let domains = state.allDomains
+    for (let i = 0; i < domains.length; i++) {
+      let subdomains = domains[i].subdomains
+      for (let j = 0; j < subdomains.length; j++) {
+        if (subdomains[j].id == info.id) {
+          subdomains[j].techs = info.techs
+          return
+        }
       }
     }
   },
@@ -64,18 +73,40 @@ export const actions = {
     let access_token = this.$cookies.get('jwt-access')
     if (access_token) {
       this.$axios.setToken(access_token, 'Bearer')
+      let domainId = ''
+      let errors = []
       try {
-        let status = await this.$axios.$post('/domains/', domainInfo)
-        domainInfo.id = status.id
-        context.commit('addDomain', domainInfo)
-        let enumRes = await this.$axios.$post(
-          `/domains/${status.id}/enumSubdomains/`
-        )
-
-        let techRes = await this.$axios.$post(`/domains/${status.id}/findTech/`)
+        let info = await this.$axios.$post('/domains/', domainInfo)
+        domainInfo.id = info.id
       } catch (error) {
         return error
       }
+      try {
+        let enumRes = await this.$axios.$post(
+          `/domains/${domainInfo.id}/enumSubdomains/`
+        )
+      } catch (error) {
+        errors.push(error)
+      }
+      try {
+        let techRes = await this.$axios.$post(
+          `/domains/${domainInfo.id}/findTech/`
+        )
+      } catch (error) {
+        errors.push(error)
+      }
+      try {
+        let photoRes = await this.$axios.$post(
+          `/domains/${domainInfo.id}/getPhoto/`
+        )
+        domainInfo.photo = photoRes.photo
+      } catch (error) {
+        errors.push(error)
+      }
+
+      context.commit('addDomain', domainInfo)
+
+      if (errors.length > 0) return errors
       return 200
     }
   },
@@ -145,6 +176,7 @@ export const actions = {
   },
   async getTechs(context, id) {
     let techRes = await this.$axios.$post(`/subdomains/${id}/findTech/`)
+    context.commit('addSubdomainTechs', techRes)
   },
 }
 
@@ -168,10 +200,24 @@ export const getters = {
     }
   },
   getSubdomains: (state) => (domain) => {
+    const isPropValuesEqual = (subject, target, propNames) =>
+      propNames.every((propName) => subject[propName] === target[propName])
+
+    const getUniqueItemsByProperties = (items, propNames) =>
+      items.filter(
+        (item, index, array) =>
+          index ===
+          array.findIndex((foundItem) =>
+            isPropValuesEqual(foundItem, item, propNames)
+          )
+      )
     let domains = state.allDomains
     for (let i = 0; i < domains.length; i++) {
       if (domains[i].name == domain) {
-        return domains[i].subdomains
+        let uniques = getUniqueItemsByProperties(domains[i].subdomains, [
+          'name',
+        ])
+        return uniques
       }
     }
   },

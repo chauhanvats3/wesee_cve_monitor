@@ -29,10 +29,6 @@ export default {
       context.app.router.push('/')
     }
   },
-  mounted() {
-    console.log(this.isAuthenticated)
-    if (!this.isAuthenticated) this.$router.push('/')
-  },
   computed: {
     ...mapGetters({ domains: 'domains/getAllDomains' }),
   },

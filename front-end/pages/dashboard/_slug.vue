@@ -69,13 +69,12 @@ export default {
   async asyncData(context) {
     const slug = context.params.slug
     let status = await context.store.dispatch('domains/getDomainsFromBackend')
-    if (status == 401) {
+    if (status != 200) {
       context.app.router.push('/')
     }
     return { slug, status }
   },
   async mounted() {
-    let status = await this.$store.dispatch('domains/getDomainsFromBackend')
     this.enumSubdomains = this.domainInfo(this.slug).enumerate
     this.getExcluded(this.slug)
   },
@@ -128,6 +127,7 @@ export default {
 <style lang="sass" scoped>
 .dashboard-slug
   position: relative
+  padding: 0 3.5%
   padding-top: 120px
   ul
     width: 100%
@@ -138,6 +138,7 @@ export default {
     @include flexify-row
     flex-wrap: wrap
     margin: 50px 0
+    padding: 0 2%
 
   .modal-wrapper
     width: 100vw

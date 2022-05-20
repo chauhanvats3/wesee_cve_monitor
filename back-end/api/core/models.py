@@ -31,28 +31,6 @@ class Subdomain(models.Model):
     include = models.BooleanField(default=True)
     techs = models.ManyToManyField(Tech)
 
-    """ def save(self, *args, **kwargs):
-        response = getTechs(self.name)
-        techs_to_add = []
-        try:
-            response = response[0]["technologies"]
-        except:
-            print("No Technologies Found!")
-
-        for tech in response:
-            randColor = "%06x" % random.randint(0, 0xFFFFFF)
-            techs_to_add.append(
-                {
-                    "name": tech["name"],
-                    "versions": {"arr": tech["versions"]},
-                    "cves": [],
-                    "color": randColor,
-                }
-            )
-        self.techs.set(techs_to_add)
-        print(self)
-        super(models.Model, self).save(*args, **kwargs) """
-
     def __str__(self):
         return "%s" % (self.name)
 
@@ -64,6 +42,7 @@ class Domain(models.Model):
     subdomains = models.ManyToManyField(Subdomain, blank=True)
     techs = models.ManyToManyField(Tech, blank=True)
     verify_code = models.PositiveIntegerField()
+    photo = models.CharField(blank=True, max_length=350)
 
     @property
     def name(self):

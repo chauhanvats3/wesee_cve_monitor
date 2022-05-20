@@ -3,7 +3,9 @@
     <p :style="{ background: bgColors[2], color: bgColors[0] }">
       {{ tech.name }}
     </p>
-    <p :style="{ background: bgColors[1] }">{{ techVersion }}</p>
+    <p :style="{ background: bgColors[1], color: bgColors[0] }">
+      {{ techVersion }}
+    </p>
     <p :style="{ background: bgColors[0], color: bgColors[2] }">
       {{ tech.cves.length }}
     </p>
@@ -20,11 +22,6 @@ export default {
   },
   computed: {
     bgColors() {
-      // let randColor = (
-      //   Math.floor(Math.random() * (999999 - 100000)) + 100000
-      // ).toString()
-      //this.tech.color = randColor
-      //console.log(Math.floor(Math.random() * (999999 - 100000)) + 100000)
       let hslValues = this.$generatePalette(this.tech.color)
       let bg = []
       for (let i = 0; i < hslValues.length; i++) {
@@ -32,6 +29,7 @@ export default {
           i
         ] = `hsl(${hslValues[i][0]}deg, ${hslValues[i][1]}%,${hslValues[i][2]}%, ${hslValues[i][3]})`
       }
+      //console.log(`${this.tech.name} : ${bg}`)
       return bg
     },
     techVersion() {

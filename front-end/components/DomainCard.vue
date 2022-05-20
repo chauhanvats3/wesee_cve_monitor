@@ -1,5 +1,5 @@
 <template>
-  <div class="domain-card">
+  <div class="domain-card" ref="domainCard">
     <div
       class="overlay"
       v-bind:class="{ verified: domainInfo.verified == true }"
@@ -19,8 +19,8 @@
       </div>
 
       <div class="content" v-if="domainInfo.verified == true">
-        <p>Number Of Subdomains : 5</p>
-        <p>No Of Techs Found : 55</p>
+        <p>Number Of Subdomains : {{ domainInfo.subdomains.length }}</p>
+        <p>No Of Techs Found : {{ domainInfo.techs.length }}</p>
         <p>No Of CVEs Discovered: 555</p>
       </div>
 
@@ -77,6 +77,14 @@ export default {
       verificationText: `we-see-verification.${this.domainInfo.name}=${this.domainInfo.verify_code}`,
     }
   },
+  computed: {
+    domainPhoto() {
+      return this.domainInfo.photo
+    },
+  },
+  mounted() {
+    this.$refs.domainCard.style.backgroundImage = `url(${this.domainInfo.photo})`
+  },
   methods: {
     ...mapActions({
       deleteThisDomain: 'domains/deleteDomainFromBackend',
@@ -115,11 +123,9 @@ export default {
     },
     async deleteDomain() {
       let status = await this.deleteThisDomain(this.domainInfo.name)
-      console.log(status)
     },
     async verifyDomain() {
       let status = await this.verifyThisDomain(this.domainInfo)
-      console.log(status)
       if (status.status == 400) {
         this.$refs.verifyCode.classList.add('not-verified')
         this.$refs.verifyCode.children[0].innerText = status.error
@@ -135,7 +141,6 @@ $top-row-height : 50px
 .domain-card
     width: 550px
     height: 350px
-    background: url(https://picsum.photos/550/350) no-repeat
     border-radius: 15px
     margin: 50px 20px
     position: relative
@@ -230,7 +235,7 @@ $top-row-height : 50px
                 transition: all 0.2s ease-in
 
                 &.verified
-                    background: #00A7A726
+                    background: rgb(0 67 67 / 46%)
                     color: $main-color
                 &.dashboard
                     background: #00A7A7D9
