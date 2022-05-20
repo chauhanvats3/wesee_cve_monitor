@@ -65,10 +65,13 @@ class DomainViewSet(viewsets.ModelViewSet):
         name = fullName.split("://")[1]
         jawab = findSubdomains(name)
         newSubdomains = []
-        for subdomain in jawab["FDNS_A"]:
-            useful = subdomain.split(",")[1]
-            print(useful)
-            newSubdomains.append({"techs": [], "name": useful, "include": "true"})
+        try:
+            for subdomain in jawab["FDNS_A"]:
+                useful = subdomain.split(",")[1]
+                print(useful)
+                newSubdomains.append({"techs": [], "name": useful, "include": "true"})
+        except:
+            newSubdomains = []
         data_to_change = {"subdomains": newSubdomains}
         serializer = DomainSerializer(thisDomain, data=data_to_change, partial=True)
         if serializer.is_valid():
