@@ -36,7 +36,7 @@ export default {
   data() {
     return {
       maxNum: 2147483647,
-      minNum: 1000000000,
+      minNum: 100000000,
     }
   },
   methods: {
@@ -65,7 +65,6 @@ export default {
       }
 
       let status = this.domainToServer(domainInfo)
-      console.log(status)
       this.$refs.domainInput.value = ''
     },
   },

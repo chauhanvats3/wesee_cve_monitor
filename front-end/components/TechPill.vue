@@ -15,11 +15,7 @@
 <script>
 export default {
   props: ['tech'],
-  methods: {
-    pillClicked() {
-      alert(this.tech.name)
-    },
-  },
+
   computed: {
     bgColors() {
       let hslValues = this.$generatePalette(this.tech.color)
@@ -35,7 +31,7 @@ export default {
     techVersion() {
       let versions = this.tech.versions.arr
       if (versions.length == 0) return 'NA'
-      if (versions.length > 1) return 'multiple'
+      if (versions.length > 1) return versions[0]
       return versions[0]
     },
   },

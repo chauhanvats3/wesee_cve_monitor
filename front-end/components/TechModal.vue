@@ -1,26 +1,73 @@
 <template>
-  <div class="tech-modal" @click.stop="modalClicked" v-if="tech.name">
+  <div class="tech-modal" v-if="tech.name" @click.stop="">
     <div class="top-bar">
-      <p :style="{ background: bgColors[2], color: bgColors[0] }">
-        {{ tech.name }}
-      </p>
-      <p :style="{ background: bgColors[1], color: bgColors[0] }">
-        {{ techVersion }}
-        <span class="edit">edit</span>
-      </p>
-      <p :style="{ background: bgColors[0], color: bgColors[2] }">
-        {{ tech.cves.length }} CVEs Found
-      </p>
+      <div>
+        <p :style="{ background: bgColors[2], color: bgColors[0] }">
+          {{ tech.name }}
+        </p>
+      </div>
+
+      <div class="version">
+        <p
+          :style="{ background: bgColors[1], color: bgColors[0] }"
+          ref="version"
+        >
+          {{ techVersion }}
+        </p>
+        <div class="newVer" ref="newVer">
+          <input
+            type="text"
+            name="newVersion"
+            id="newVersion"
+            :style="{ background: bgColors[1], color: bgColors[0] }"
+            v-model="newTechVer"
+          />
+          <p class="edit" @click.stop="okClicked">ok</p>
+        </div>
+        <p class="edit" @click.stop="editClicked">edit</p>
+      </div>
+
+      <div>
+        <p :style="{ background: bgColors[0], color: bgColors[2] }">
+          {{ tech.cves.length }} CVEs Found
+        </p>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   props: ['tech'],
+  data() {
+    return {
+      isEditing: false,
+      newTechVer: '',
+    }
+  },
   methods: {
-    modalClicked() {
-      console.log(this.tech.color)
+    ...mapActions({ updateTech: 'domains/updateTech' }),
+    editClicked() {
+      this.$refs.newVer.classList.add('show')
+    },
+    async okClicked() {
+      console.log(this.newTechVer)
+      if (
+        this.newTechVer == '' ||
+        !Number.isInteger(parseInt(this.newTechVer.replaceAll('.', '')))
+      ) {
+        this.newTechVer = ''
+        this.$refs.newVer.classList.remove('show')
+        return
+      }
+
+      this.tech.versions.arr[0] = this.newTechVer
+      let status = await this.updateTech(this.tech)
+      console.log(status)
+      this.newTechVer = ''
+      this.$refs.newVer.classList.remove('show')
     },
   },
   computed: {
@@ -40,7 +87,7 @@ export default {
     techVersion() {
       let versions = this.tech.versions.arr
       if (versions.length == 0) return 'NA'
-      if (versions.length > 1) return 'multiple'
+      if (versions.length > 1) return versions[0]
       return versions[0]
     },
   },
@@ -60,30 +107,52 @@ export default {
     width: 100%
     @include flexify-row
     justify-content: space-evenly
-    p
-      color: white
-      flex-grow: 1
-      padding: 10px 30px
+    div
       border-bottom-right-radius: 10px
       border-top-right-radius: 10px
       @include flexify-row
+      flex-grow: 1
       position: relative
-      .edit
-        color: #f1f1f1
-        cursor: pointer
-        margin: 0 20px 0 10px
-        font-size: 16px
-        position: absolute
-        right: 0
+      overflow: hidden
 
-    p:nth-child(1)
-        margin-right: -20px
-        border-top-left-radius: 10px
-        z-index: 2
-    p:nth-child(2)
-        margin-right: -20px
-        z-index: 1
-    p:nth-child(3)
-        padding-right: 20px
-        border-bottom-right-radius: 0
+      p
+        color: white
+        width: 100%
+        @include flexify-row
+        flex-grow: 1
+        padding: 10px
+
+        &.edit
+          color: #f1f1f1
+          cursor: pointer
+          font-size: 16px
+          position: absolute
+          right: 0
+          width: max-content
+
+    div:nth-child(1)
+          margin-right: -20px
+          border-top-left-radius: 10px
+          z-index: 2
+    div:nth-child(2)
+          margin-right: -20px
+          z-index: 1
+    div:nth-child(3)
+          border-bottom-right-radius: 0
+    .version
+      .newVer
+        position: absolute
+        left: -100%
+        width: 100%
+        height: 100%
+        transition: all 0.2s ease-in
+        input
+          height: 100%
+          border-radius: 10px
+          border: none
+          outline: none
+          padding:0 45px
+          text-align: center
+        &.show
+          left: 0
 </style>

@@ -38,6 +38,7 @@ export default {
     width: 100%
     @include flexify-row
     z-index: 10
+    box-shadow: 0 1px 1px rgba(0,0,0,0.11),0 2px 2px rgba(0,0,0,0.11),0 4px 4px rgba(0,0,0,0.11),0 8px 8px rgba(0,0,0,0.11),0 16px 16px rgba(0,0,0,0.11),0 32px 32px rgba(0,0,0,0.11)
 
     .logo
       height: 50px

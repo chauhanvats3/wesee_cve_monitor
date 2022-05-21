@@ -49,7 +49,31 @@ export const mutations = {
       for (let j = 0; j < subdomains.length; j++) {
         if (subdomains[j].id == info.id) {
           subdomains[j].techs = info.techs
+          subdomains[j].techSearched = true
           return
+        }
+      }
+    }
+  },
+  updateStateTech(state, tech) {
+    let domains = state.allDomains
+    for (let i = 0; domains.length; i++) {
+      let subdomains = domains[i].subdomains
+      let domainTechs = domains[i].techs
+      for (let j = 0; j < domainTechs.length; j++) {
+        if (domainTechs[j].id == tech.id) {
+          domainTechs[j] = tech
+          return
+        }
+      }
+
+      for (let j = 0; j < subdomains.length; j++) {
+        let subdomainTechs = subdomains[j].techs
+        for (let k = 0; k < subdomainTechs.length; k++) {
+          if (subdomainTechs[k].id == tech.id) {
+            subdomainTechs[k] = tech
+            return
+          }
         }
       }
     }
@@ -175,8 +199,25 @@ export const actions = {
     }
   },
   async getTechs(context, id) {
-    let techRes = await this.$axios.$post(`/subdomains/${id}/findTech/`)
+    let techRes = {}
+    try {
+      techRes = await this.$axios.$post(`/subdomains/${id}/findTech/`)
+    } catch (error) {
+      context.commit('addSubdomainTechs', techRes)
+    }
     context.commit('addSubdomainTechs', techRes)
+  },
+  async updateTech(context, tech) {
+    let techRes = ''
+    try {
+      techRes = await this.$axios.$patch(`/techs/${tech.id}/`, tech)
+      return techRes
+    } catch (error) {
+      return error
+    }
+
+    context.commit('updateStateTech', tech)
+    return 200
   },
 }
 

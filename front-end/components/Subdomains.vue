@@ -44,7 +44,7 @@ export default {
   mounted() {
     let subdomainsListed = this.getSubdomains(this.domain)
     for (let i = 0; i < subdomainsListed.length; i++) {
-      if (subdomainsListed[i].techs.length == 0) {
+      if (subdomainsListed[i].techSearched != true) {
         this.getSubdomainTechs(subdomainsListed[i].id)
       }
     }

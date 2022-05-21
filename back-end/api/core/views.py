@@ -1,15 +1,12 @@
 from crypt import methods
 import random
 import json
-from .getPhoto import getPhoto
+
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.core import serializers
-from .lookupDNS import verifyDomain
-from .searchSubdomains import findSubdomains
-from .getTechs import getTechs
 from .serializers import (
     DomainSerializer,
     SubdomainSerializer,
@@ -17,6 +14,7 @@ from .serializers import (
     CVESerializer,
     UserSerializer,
 )
+from .utilities import findSubdomains, getCVEs, getPhoto, getTechs, verifyDomain
 from .models import Domain, Subdomain, Tech, CVE, User
 
 

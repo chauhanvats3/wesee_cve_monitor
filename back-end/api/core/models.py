@@ -1,7 +1,4 @@
-import random
 from django.db import models
-
-from .getTechs import getTechs
 
 # Create your models here.
 

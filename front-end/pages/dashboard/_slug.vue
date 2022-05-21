@@ -64,6 +64,7 @@ export default {
       enumSubdomains: false,
       excludedSubdomainsExist: false,
       newSubdomainName: '',
+      isEditing: false,
     }
   },
   async asyncData(context) {
