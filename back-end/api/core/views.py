@@ -32,7 +32,6 @@ class DomainViewSet(viewsets.ModelViewSet):
                 thisDomain,
             ],
         )
-        print(thisObject)
         struct = json.loads(thisObject)[0]
         fullName = struct["fields"]["full_name"]
         verificationNumber = struct["fields"]["verify_code"]
@@ -58,7 +57,6 @@ class DomainViewSet(viewsets.ModelViewSet):
                 thisDomain,
             ],
         )
-        print(thisObject)
         struct = json.loads(thisObject)[0]
         fullName = struct["fields"]["full_name"]
         name = fullName.split("://")[1]
@@ -67,7 +65,6 @@ class DomainViewSet(viewsets.ModelViewSet):
         try:
             for subdomain in jawab["FDNS_A"]:
                 useful = subdomain.split(",")[1]
-                print(useful)
                 newSubdomains.append({"techs": [], "name": useful, "include": "true"})
         except:
             newSubdomains = []
@@ -115,7 +112,6 @@ class DomainViewSet(viewsets.ModelViewSet):
                 thisDomain,
             ],
         )
-        print(thisObject)
         struct = json.loads(thisObject)[0]
         fullName = struct["fields"]["full_name"]
         verificationNumber = struct["fields"]["verify_code"]

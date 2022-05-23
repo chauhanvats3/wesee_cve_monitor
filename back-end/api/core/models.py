@@ -1,10 +1,18 @@
 from django.db import models
 
+from .utilities import getCVEs, vulnerability
+
 # Create your models here.
 
 
 class CVE(models.Model):
+    def json_default():
+        return {"arr": []}
+
     description = models.TextField(blank=True)
+    severity = models.CharField(max_length=20)
+    score = models.CharField(max_length=5)
+    references = models.JSONField(default=json_default)
 
     def __str__(self):
         return self.description
@@ -21,6 +29,20 @@ class Tech(models.Model):
 
     def __str__(self):
         return "%s" % (self.name)
+
+    def save(self, *args, **kwargs):
+        print("save override")
+        versions = self.versions["arr"]
+        version = ""
+        if not versions:
+            version = ""
+        else:
+            version = versions[0]
+
+        print(version)
+        response = getCVEs(self.name)
+        print(response)
+        super(Tech, self).save(*args, **kwargs)
 
 
 class Subdomain(models.Model):

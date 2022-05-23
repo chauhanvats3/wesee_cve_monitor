@@ -278,4 +278,26 @@ export const getters = {
   getAllDomains(state) {
     return state.allDomains
   },
+  getTech: (state) => (techId) => {
+    let domains = state.allDomains
+    for (let i = 0; domains.length; i++) {
+      console.log(domains[i])
+      let subdomains = domains[i].subdomains
+      let domainTechs = domains[i].techs
+      for (let j = 0; j < domainTechs.length; j++) {
+        if (domainTechs[j].id == techId) {
+          return domainTechs[j]
+        }
+      }
+
+      for (let j = 0; j < subdomains.length; j++) {
+        let subdomainTechs = subdomains[j].techs
+        for (let k = 0; k < subdomainTechs.length; k++) {
+          if (subdomainTechs[k].id == techId) {
+            return subdomainTechs[k]
+          }
+        }
+      }
+    }
+  },
 }
