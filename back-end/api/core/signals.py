@@ -25,8 +25,3 @@ def cascadeDeleteSubdomain(sender, instance, **kwargs):
 def cascadeDeleteTech(sender, instance, **kwargs):
     for cve in instance.cves.all():
         cve.delete()
-
-
-@receiver(pre_save, sender=Tech)
-def addCVEs(sender, instance, **kwargs):
-    print(instance, instance.versions)

@@ -207,10 +207,12 @@ export const actions = {
     }
     context.commit('addSubdomainTechs', techRes)
   },
-  async updateTech(context, tech) {
+  async updateTech(context, info) {
     let techRes = ''
     try {
-      techRes = await this.$axios.$patch(`/techs/${tech.id}/`, tech)
+      techRes = await this.$axios.$patch(`/techs/${info.id}/`, {
+        versions: { arr: [info.newVer] },
+      })
       return techRes
     } catch (error) {
       return error

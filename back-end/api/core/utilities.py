@@ -1,47 +1,74 @@
 import requests
-import vulners
 
 
-""" def vulnerability(name, version):
-    vulners_api = vulners.Vulners(
-        api_key="XV07ZQ8AJ9FQ97M71NB0LM85SJSFKESBVFLRZ6VHOEAZ6UAHYAKY1KW1URN0DF3Q"
-    )
+def extractDataFromCVE(response):
+    cves_array = []
+    results = response.json()["result"]["CVE_Items"]
+    for item in results:
+        ref_urls = []
+        cve = item["cve"]
+        references = cve["references"]["reference_data"]
+        for reference in references:
+            ref_urls.append(reference["url"])
+        description = cve["description"]["description_data"][0]["value"]
+        score = None
+        severity = None
+        try:
+            score = item["impact"]["baseMetricV3"]["cvssV3"]["baseScore"]
+            severity = item["impact"]["baseMetricV3"]["cvssV3"]["baseSeverity"]
+        except:
+            score = item["impact"]["baseMetricV2"]["cvssV2"]["baseScore"]
+            severity = item["impact"]["baseMetricV2"]["severity"]
 
-    results = vulners_api.get_software_vulnerabilities(name, version)
-    exploit_list = results.get("exploit")
-    vulnerabilities_list = [
-        results.get(key) for key in results if key not in ["info", "blog", "bugbounty"]
-    ]
-    print("Vulnersablities")
-    print(vulnerabilities_list)
- """
-
-
-def vulnerability(name, version):
-    endpoint = "https://vulners.com/api/v3/burp/software/"
-    headers = {"Content-Type: application/json"}
-    print(name, version)
-    if not version:
-        version = ""
-    queryData = {
-        "software": name,
-        "version": version,
-        "type": "software",
-        "maxVulnerabilities": 100,
-        "apiKey": "XV07ZQ8AJ9FQ97M71NB0LM85SJSFKESBVFLRZ6VHOEAZ6UAHYAKY1KW1URN0DF3Q",
-    }
-    response = requests.post(endpoint, data=queryData, headers=headers)
-    print(response)
+        cves_array.append(
+            {
+                "references": ref_urls,
+                "description": description,
+                "severity": severity,
+                "score": score,
+            }
+        )
+    return cves_array
 
 
 def getCVEs(technology, version):
+    if not version:
+        version = "*"
+    technology = technology.replace(" ", "_")
     apiKey = "09287fcf-8c39-4531-a50e-0a5132cb4664"
     cpeString1 = "cpe:2.3:a:*:" + technology + ":" + version + ":*:*:*:*:*:*:*"
-    cpeString1 = "cpe:2.3:a:" + technology + ":*:" + version + ":*:*:*:*:*:*:*"
+    cpeString2 = "cpe:2.3:a:" + technology + ":*:" + version + ":*:*:*:*:*:*:*"
 
-    endpoint = "https://services.nvd.nist.gov/rest/json/cves/1.0/?keyword=" + technology
-    response = requests.get(endpoint)
-    return response.json()
+    cves = []
+
+    endpoint1 = (
+        "https://services.nvd.nist.gov/rest/json/cves/1.0/?cpeMatchString="
+        + cpeString1
+        + "&apiKey="
+        + apiKey
+        + "&resultsPerPage=200"
+    )
+    endpoint2 = (
+        "https://services.nvd.nist.gov/rest/json/cves/1.0/?cpeMatchString="
+        + cpeString2
+        + "&apiKey="
+        + apiKey
+        + "&resultsPerPage=200"
+    )
+
+    print(endpoint1)
+    response = requests.get(endpoint1)
+    extraction = extractDataFromCVE(response)
+    if extraction is not None:
+        cves = cves + extraction
+
+    print(endpoint2)
+    response = requests.get(endpoint2)
+    extraction = extractDataFromCVE(response)
+    if extraction is not None:
+        cves = cves + extraction
+
+    return cves
 
 
 def getPhoto():

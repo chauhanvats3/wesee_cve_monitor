@@ -33,6 +33,7 @@
         </p>
       </div>
     </div>
+    <CVE />
   </div>
 </template>
 
@@ -51,6 +52,7 @@ export default {
     ...mapActions({ updateTech: 'domains/updateTech' }),
     editClicked() {
       this.$refs.newVer.classList.add('show')
+      this.newTechVer = this.techVersion
     },
     async okClicked() {
       console.log(this.newTechVer)
@@ -64,7 +66,10 @@ export default {
       }
 
       this.tech.versions.arr[0] = this.newTechVer
-      let status = await this.updateTech(this.tech)
+      let status = await this.updateTech({
+        id: this.tech.id,
+        newVer: this.newTechVer,
+      })
       console.log(status)
       this.newTechVer = ''
       this.$refs.newVer.classList.remove('show')

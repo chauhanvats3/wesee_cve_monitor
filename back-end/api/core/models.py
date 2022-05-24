@@ -1,8 +1,6 @@
 from django.db import models
 
-from .utilities import getCVEs, vulnerability
-
-# Create your models here.
+from .utilities import getCVEs
 
 
 class CVE(models.Model):
@@ -13,9 +11,14 @@ class CVE(models.Model):
     severity = models.CharField(max_length=20)
     score = models.CharField(max_length=5)
     references = models.JSONField(default=json_default)
+    tech_id = models.CharField(max_length=5)
 
     def __str__(self):
         return self.description
+
+    def save(self, *args, **kwargs):
+        super(CVE, self).save(*args, **kwargs)
+        self.techno.add(self.tech_id)
 
 
 class Tech(models.Model):
@@ -24,25 +27,34 @@ class Tech(models.Model):
 
     name = models.CharField(max_length=100)
     versions = models.JSONField(default=json_default)
-    cves = models.ManyToManyField(CVE, blank=True)
+    cves = models.ManyToManyField(CVE, blank=True, related_name="techno")
     color = models.CharField(max_length=6, default="828192")
 
     def __str__(self):
-        return "%s" % (self.name)
+        return "%s " % (self.name)
 
     def save(self, *args, **kwargs):
-        print("save override")
+        super(Tech, self).save(*args, **kwargs)
+        for old_cve in self.cves.all():
+            old_cve.delete()
         versions = self.versions["arr"]
         version = ""
         if not versions:
             version = ""
         else:
             version = versions[0]
-
-        print(version)
-        response = getCVEs(self.name)
-        print(response)
-        super(Tech, self).save(*args, **kwargs)
+        response = getCVEs(self.name, version)
+        for eachCVE in response:
+            arr = {"arr": eachCVE["references"]}
+            cve = None
+            cve = self.cves.create(
+                description=eachCVE["description"],
+                severity=eachCVE["severity"],
+                score=eachCVE["score"],
+                references=arr,
+                tech_id=self.id,
+            )
+            self.cves.add(cve)
 
 
 class Subdomain(models.Model):
