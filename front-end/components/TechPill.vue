@@ -32,7 +32,7 @@ export default {
       let versions = this.tech.versions.arr
       if (versions.length == 0) return 'NA'
       if (versions.length > 1) return versions[0]
-      return versions[0]
+      return versions[0] == '' ? 'NA' : versions[0]
     },
   },
 }

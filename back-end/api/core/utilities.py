@@ -35,6 +35,7 @@ def getCVEs(technology, version):
     if not version:
         version = "*"
     technology = technology.replace(" ", "_")
+    technology = technology.replace("-", "_")
     apiKey = "09287fcf-8c39-4531-a50e-0a5132cb4664"
     cpeString1 = "cpe:2.3:a:*:" + technology + ":" + version + ":*:*:*:*:*:*:*"
     cpeString2 = "cpe:2.3:a:" + technology + ":*:" + version + ":*:*:*:*:*:*:*"

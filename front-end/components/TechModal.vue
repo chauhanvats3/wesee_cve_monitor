@@ -33,19 +33,34 @@
         </p>
       </div>
     </div>
-    <CVE />
+    <!--  <div class="cves">
+      <CVE v-for="(cve, index) in tech.cves" :key="index" :cve="cve" />
+    </div> -->
+    <virtual-list
+      class="cves"
+      :data-key="'id'"
+      :data-sources="tech.cves"
+      :data-component="cveComponent"
+      :keeps="noOfItems"
+      :estimate-size="sizeOfItem"
+    />
   </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
-
+import CVE from './CVE'
+import VirtualList from 'vue-virtual-scroll-list'
 export default {
   props: ['tech'],
+  components: { 'virtual-list': VirtualList },
   data() {
     return {
+      cveComponent: CVE,
       isEditing: false,
       newTechVer: '',
+      noOfItems: 20,
+      sizeOfItem: 300,
     }
   },
   methods: {
@@ -64,15 +79,20 @@ export default {
         this.$refs.newVer.classList.remove('show')
         return
       }
-
+      if (this.newTechVer == this.techVersion) {
+        console.log('same version')
+        this.$refs.newVer.classList.remove('show')
+        return
+      }
+      let newVer = this.newTechVer
       this.tech.versions.arr[0] = this.newTechVer
-      let status = await this.updateTech({
-        id: this.tech.id,
-        newVer: this.newTechVer,
-      })
-      console.log(status)
       this.newTechVer = ''
       this.$refs.newVer.classList.remove('show')
+      let status = await this.updateTech({
+        id: this.tech.id,
+        newVer: newVer,
+      })
+      console.log(status)
     },
   },
   computed: {
@@ -93,7 +113,7 @@ export default {
       let versions = this.tech.versions.arr
       if (versions.length == 0) return 'NA'
       if (versions.length > 1) return versions[0]
-      return versions[0]
+      return versions[0] == '' ? 'NA' : versions[0]
     },
   },
 }
@@ -108,6 +128,8 @@ export default {
   border-radius: 15px
   background: white
   z-index: 2
+  overflow-y: scroll
+  position: relative
   .top-bar
     width: 100%
     @include flexify-row
@@ -125,7 +147,7 @@ export default {
         width: 100%
         @include flexify-row
         flex-grow: 1
-        padding: 10px
+        padding: 15px 10px
 
         &.edit
           color: #f1f1f1
@@ -160,4 +182,8 @@ export default {
           text-align: center
         &.show
           left: 0
+  .cves
+    width: 100%
+    height: 100%
+    overflow-y: scroll
 </style>

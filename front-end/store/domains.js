@@ -213,13 +213,11 @@ export const actions = {
       techRes = await this.$axios.$patch(`/techs/${info.id}/`, {
         versions: { arr: [info.newVer] },
       })
+      context.commit('updateStateTech', techRes)
       return techRes
     } catch (error) {
       return error
     }
-
-    context.commit('updateStateTech', tech)
-    return 200
   },
 }
 
