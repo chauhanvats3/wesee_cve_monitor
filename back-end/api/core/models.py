@@ -1,4 +1,8 @@
+from urllib import request
 from django.db import models
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.backends import TokenBackend
+
 
 from .utilities import getCVEs
 
@@ -74,6 +78,7 @@ class Domain(models.Model):
     techs = models.ManyToManyField(Tech, blank=True)
     verify_code = models.PositiveIntegerField()
     photo = models.CharField(blank=True, max_length=350)
+    author = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
 
     @property
     def name(self):
@@ -87,10 +92,13 @@ class Domain(models.Model):
         return "%s : %s" % (self.name, self.protocol)
 
 
-class User(models.Model):
-    email = models.EmailField(primary_key=True)
-    password = models.CharField(max_length=32)
-    domains = models.ManyToManyField(Domain)
-
-    def __str__(self):
-        return "%s" % (self.email)
+"""     def save(self, *args, **kwargs):
+        super(Domain, self).save(*args, **kwargs)
+        token = request.META.get("HTTP_AUTHORIZATION", " ").split(" ")[1]
+        data = {"token": token}
+        try:
+            valid_data = TokenBackend(algorithm="HS256").decode(token, verify=True)
+            user = valid_data["user"]
+        except:
+            print("validation error")
+        self.author = user """

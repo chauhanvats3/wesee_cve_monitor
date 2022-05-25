@@ -12,16 +12,19 @@ from .serializers import (
     SubdomainSerializer,
     TechSerializer,
     CVESerializer,
-    UserSerializer,
 )
 from .utilities import findSubdomains, getCVEs, getPhoto, getTechs, verifyDomain
-from .models import Domain, Subdomain, Tech, CVE, User
+from .models import Domain, Subdomain, Tech, CVE
 
 
 class DomainViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = DomainSerializer
     queryset = Domain.objects.all()
+
+    def perform_create(self, serializer):
+        print(self.request.user)
+        serializer.save(author=self.request.user)
 
     @action(detail=True, methods=["post"])
     def verify(self, request, pk):
@@ -171,9 +174,3 @@ class CVEViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = CVESerializer
     queryset = CVE.objects.all()
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
