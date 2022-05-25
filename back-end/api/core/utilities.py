@@ -3,7 +3,11 @@ import requests
 
 def extractDataFromCVE(response):
     cves_array = []
-    results = response.json()["result"]["CVE_Items"]
+    try:
+        results = response.json()["result"]["CVE_Items"]
+    except:
+        return None
+
     for item in results:
         ref_urls = []
         cve = item["cve"]
