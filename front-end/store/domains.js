@@ -21,6 +21,16 @@ export const mutations = {
   },
   addDomain(state, domainInfo) {
     let domain = { ...domainInfo }
+    for (let i = 0; i < state.allDomains.length; i++) {
+      let thisDomain = state.allDomains[i]
+      if (thisDomain.id == domain.id) {
+        state.allDomains[i] = domain
+        console.log('Updating')
+        console.log(state.allDomains)
+        return
+      }
+    }
+    console.log('Adding New')
     domain.name = domainInfo.full_name.split('://')[1]
     domain.verified = false
     state.allDomains.push(domain)
@@ -82,8 +92,6 @@ export const mutations = {
 
 export const actions = {
   async getDomainsFromBackend(context) {
-    let access_token = this.$cookies.get('jwt-access')
-    this.$axios.setToken(access_token, 'Bearer')
     let domains = []
     try {
       domains = await this.$axios.$get('/domains/')
@@ -94,73 +102,63 @@ export const actions = {
     return 200
   },
   async addDomainToBackend(context, domainInfo) {
-    let access_token = this.$cookies.get('jwt-access')
-    if (access_token) {
-      this.$axios.setToken(access_token, 'Bearer')
-      let domainId = ''
-      let errors = []
-      try {
-        let info = await this.$axios.$post('/domains/', domainInfo)
-        domainInfo.id = info.id
-      } catch (error) {
-        return error
-      }
-      try {
-        let enumRes = await this.$axios.$post(
-          `/domains/${domainInfo.id}/enumSubdomains/`
-        )
-      } catch (error) {
-        errors.push(error)
-      }
-      try {
-        let techRes = await this.$axios.$post(
-          `/domains/${domainInfo.id}/findTech/`
-        )
-      } catch (error) {
-        errors.push(error)
-      }
-      try {
-        let photoRes = await this.$axios.$post(
-          `/domains/${domainInfo.id}/getPhoto/`
-        )
-        domainInfo.photo = photoRes.photo
-      } catch (error) {
-        errors.push(error)
-      }
-
+    let domainId = ''
+    let errors = []
+    try {
+      let info = await this.$axios.$post('/domains/', domainInfo)
+      domainInfo.id = info.id
       context.commit('addDomain', domainInfo)
-
-      if (errors.length > 0) return errors
-      return 200
+    } catch (error) {
+      return error
     }
+    try {
+      let photoRes = await this.$axios.$post(
+        `/domains/${domainInfo.id}/getPhoto/`
+      )
+      domainInfo.photo = photoRes.photo
+      context.commit('addDomain', domainInfo)
+    } catch (error) {
+      errors.push(error)
+    }
+    try {
+      let enumRes = await this.$axios.$post(
+        `/domains/${domainInfo.id}/enumSubdomains/`
+      )
+      context.commit('addDomain', domainInfo)
+    } catch (error) {
+      errors.push(error)
+    }
+    try {
+      let techRes = await this.$axios.$post(
+        `/domains/${domainInfo.id}/findTech/`
+      )
+      context.commit('addDomain', domainInfo)
+    } catch (error) {
+      errors.push(error)
+    }
+
+    if (errors.length > 0) return errors
+    return 200
   },
   async verifyDomain(context, domainInfo) {
-    let access_token = this.$cookies.get('jwt-access')
-    if (access_token) {
-      this.$axios.setToken(access_token, 'Bearer')
-      try {
-        let status = await this.$axios.$post(
-          '/domains/' + domainInfo.id + '/verify/'
-        )
-        return status
-      } catch (error) {
-        return error
-      }
+    try {
+      let status = await this.$axios.$post(
+        '/domains/' + domainInfo.id + '/verify/'
+      )
+      return status
+    } catch (error) {
+      return error
     }
   },
   async deleteDomainFromBackend(context, domainName) {
     let domainId = context.getters.getDomainInfo(domainName, 'id')
-    let access_token = this.$cookies.get('jwt-access')
-    if (access_token) {
-      this.$axios.setToken(access_token, 'Bearer')
-      try {
-        await this.$axios.$delete('/domains/' + domainId)
-        context.commit('removeDomain', domainId)
-      } catch (error) {
-        return error
-      }
-      return 200
+    try {
+      await this.$axios.$delete('/domains/' + domainId)
+      context.commit('removeDomain', domainId)
+    } catch (error) {
+      return error
     }
+    return 200
   },
   async addSubdomainToBackend(context, info) {
     let domainId = context.getters.getDomainInfo(info.domainName, 'id')
@@ -180,23 +178,19 @@ export const actions = {
       ],
     }
 
-    let access_token = this.$cookies.get('jwt-access')
-    if (access_token) {
-      this.$axios.setToken(access_token, 'Bearer')
-      try {
-        let response = await this.$axios.$patch(
-          '/domains/' + domainId + '/',
-          updateData
-        )
-        context.commit('addSubdomain', {
-          id: domainId,
-          subdomain: response.subdomains.pop(),
-        })
-      } catch (error) {
-        return error
-      }
-      return 200
+    try {
+      let response = await this.$axios.$patch(
+        '/domains/' + domainId + '/',
+        updateData
+      )
+      context.commit('addSubdomain', {
+        id: domainId,
+        subdomain: response.subdomains.pop(),
+      })
+    } catch (error) {
+      return error
     }
+    return 200
   },
   async getTechs(context, id) {
     let techRes = {}
@@ -223,6 +217,7 @@ export const actions = {
 
 export const getters = {
   getDomainInfo: (state) => (domainName, infoAsked) => {
+    console.log(domainName)
     let domains = state.allDomains
     for (let i = 0; i < domains.length; i++) {
       if (domains[i].name.includes(domainName)) {

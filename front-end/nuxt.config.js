@@ -54,19 +54,25 @@ export default {
           logout: false,
         },
         token: {
+          prefix: 'access.',
           property: 'access',
           global: true,
           required: true,
           type: 'Bearer',
+        },
+        user: {
+          property: false,
         },
       },
     },
     redirect: {
       login: '/',
       logout: '/',
-      callback: '/',
+      callback: false,
       home: '/domains',
     },
+    localStorage: false,
+    resetOnError: true,
   },
 
   fontLoader: {

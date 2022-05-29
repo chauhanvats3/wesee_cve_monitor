@@ -1,5 +1,9 @@
 <template>
-  <div class="domain-card" ref="domainCard">
+  <div
+    class="domain-card"
+    ref="domainCard"
+    :style="{ backgroundImage: 'url(' + domainPhoto + ')' }"
+  >
     <div
       class="overlay"
       v-bind:class="{ verified: domainInfo.verified == true }"
@@ -79,11 +83,10 @@ export default {
   },
   computed: {
     domainPhoto() {
-      return this.domainInfo.photo
+      if (this.domainInfo.photo != undefined) {
+        return this.domainInfo.photo
+      } else return 'https://random.imagecdn.app/550/350'
     },
-  },
-  mounted() {
-    this.$refs.domainCard.style.backgroundImage = `url(${this.domainInfo.photo})`
   },
   methods: {
     ...mapActions({

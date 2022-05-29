@@ -1,55 +1,68 @@
 <template>
   <div class="dashboard-slug">
     <Nav />
-    <h1 ref="h1">
-      {{ thisDomain.name }}
-    </h1>
+    <p v-if="$fetchState.pending">Fetching Domains...</p>
+    <div v-else>
+      <h1 ref="h1">
+        {{ thisDomain.name }}
+      </h1>
 
-    <div class="techs">
-      <TechPill
-        v-for="(tech, index) in thisDomain.techs"
-        :key="index"
-        :tech="tech"
-        v-on:pill-clicked="openTechDetails"
-      />
-    </div>
-    <div class="modal-wrapper" ref="techModalWrapper" @click.stop="closeModal">
-      <TechModal :tech="techToOpen" />
-    </div>
-
-    <div class="options">
-      <div class="enum">
-        <input
-          type="checkbox"
-          name="enumerate"
-          id="enumChkbx"
-          ref="chkbxEnum"
-          v-model="enumSubdomains"
+      <div class="techs">
+        <TechPill
+          v-for="(tech, index) in thisDomain.techs"
+          :key="index"
+          :tech="tech"
+          v-on:pill-clicked="openTechDetails"
         />
-        <p @click="checkBoxClick" style="cursor: pointer; letter-spacing: 2px">
-          Enumerate Subdomains?
-        </p>
       </div>
-      <div class="addSubDomain">
-        <input
-          type="text"
-          name="subdomain"
-          id="subDomainTxt"
-          ref="newSubdomain"
-          placeholder="https://"
-          v-model="newSubdomainName"
-        />
-        <div class="btn add-subdomain" @click="addSubdomain">
-          <p>Add Subdomain</p>
+      <div
+        class="modal-wrapper"
+        ref="techModalWrapper"
+        @click.stop="closeModal"
+      >
+        <TechModal :tech="techToOpen" />
+      </div>
+
+      <div class="options">
+        <div class="enum">
+          <input
+            type="checkbox"
+            name="enumerate"
+            id="enumChkbx"
+            ref="chkbxEnum"
+            v-model="enumSubdomains"
+          />
+          <p
+            @click="checkBoxClick"
+            style="cursor: pointer; letter-spacing: 2px"
+          >
+            Enumerate Subdomains?
+          </p>
+        </div>
+        <div class="addSubDomain">
+          <input
+            type="text"
+            name="subdomain"
+            id="subDomainTxt"
+            ref="newSubdomain"
+            placeholder="https://"
+            v-model="newSubdomainName"
+          />
+          <div class="btn add-subdomain" @click="addSubdomain">
+            <p>Add Subdomain</p>
+          </div>
         </div>
       </div>
+      <Subdomains
+        v-if="enumSubdomains"
+        :domain="slug"
+        v-on:sub-pill-clicked="openSubTechDetails"
+      />
+      <ExcludedSubdomains
+        :domain="slug"
+        v-if="enumSubdomains && excludedExist"
+      />
     </div>
-    <Subdomains
-      v-if="enumSubdomains"
-      :domain="slug"
-      v-on:sub-pill-clicked="openSubTechDetails"
-    />
-    <ExcludedSubdomains :domain="slug" v-if="enumSubdomains && excludedExist" />
   </div>
 </template>
 
@@ -61,7 +74,6 @@ export default {
 
   data() {
     return {
-      isAuthenticated: this.$store.state.user.isAuthenticated,
       techToOpen: {},
       enumSubdomains: false,
       excludedSubdomainsExist: false,
@@ -69,10 +81,11 @@ export default {
       isEditing: false,
     }
   },
-  async mounted() {
-    this.enumSubdomains = this.domainInfo(this.slug).enumerate
-    this.getExcluded(this.slug)
+  async asyncData(context) {
+    const slug = context.params.slug
+    return { slug }
   },
+
   computed: {
     ...mapGetters({
       domains: 'domains/getAllDomains',
@@ -81,6 +94,12 @@ export default {
     }),
     thisDomain() {
       let info = this.domainInfo(this.slug)
+      if (info == undefined) {
+        return {
+          name: '',
+          techs: [],
+        }
+      }
       return info
     },
     excludedExist() {
@@ -89,7 +108,10 @@ export default {
     },
   },
   methods: {
-    ...mapActions({ subdomainToBackend: 'domains/addSubdomainToBackend' }),
+    ...mapActions({
+      subdomainToBackend: 'domains/addSubdomainToBackend',
+      getDomainsFromBackend: 'domains/getDomainsFromBackend',
+    }),
     openTechDetails(tech) {
       this.techToOpen = tech
       this.$refs.techModalWrapper.classList.add('show')
@@ -116,6 +138,11 @@ export default {
       this.newSubdomainName = ''
     },
   },
+
+  async fetch() {
+    await this.getDomainsFromBackend()
+  },
+  fetchOnServer: false,
 }
 </script>
 

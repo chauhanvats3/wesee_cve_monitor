@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   middleware: 'auth',
@@ -26,6 +26,15 @@ export default {
   computed: {
     ...mapGetters({ domains: 'domains/getAllDomains' }),
   },
+  methods: {
+    ...mapActions({
+      getDomainsFromBackend: 'domains/getDomainsFromBackend',
+    }),
+  },
+  async fetch() {
+    await this.getDomainsFromBackend()
+  },
+  fetchOnServer: false,
 }
 </script>
 
