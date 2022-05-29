@@ -31,11 +31,7 @@ export default {
   buildModules: ['@nuxtjs/style-resources', 'nuxt-font-loader'],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [
-    // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
-    'cookie-universal-nuxt',
-  ],
+  modules: ['@nuxtjs/axios', 'cookie-universal-nuxt', '@nuxtjs/auth-next'],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
@@ -45,6 +41,33 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+
+  router: {
+    middleware: ['auth'],
+  },
+  auth: {
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: 'token/', method: 'post', propertyName: 'data.token' },
+          user: false,
+          logout: false,
+        },
+        token: {
+          property: 'access',
+          global: true,
+          required: true,
+          type: 'Bearer',
+        },
+      },
+    },
+    redirect: {
+      login: '/',
+      logout: '/',
+      callback: '/',
+      home: '/domains',
+    },
+  },
 
   fontLoader: {
     url: 'https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap',

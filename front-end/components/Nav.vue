@@ -8,21 +8,15 @@
       <NuxtLink to="/domains">Domains</NuxtLink>
       <NuxtLink to="/dashboard">Dashboard</NuxtLink>
       <a style="cursor: pointer" @click="logout">Logout</a>
-      <!-- 
-      <NuxtLink to="/user" @click="destroyTokens">Logout</NuxtLink> -->
     </div>
   </div>
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
-
 export default {
   methods: {
-    ...mapMutations(['destroyTokens']),
-    logout() {
-      this.destroyTokens()
-      this.$router.push('/')
+    async logout() {
+      await this.$auth.logout()
     },
   },
 }

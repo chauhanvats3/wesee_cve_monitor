@@ -17,7 +17,7 @@
       @keypress.enter="login"
     />
     <button class="button" @click="login">Login</button>
-    <p v-if="incorrectAuth">Wrong Credentials!</p>
+    <p v-if="incorrectAuth">Wrong Credentials</p>
   </div>
 </template>
 
@@ -30,24 +30,28 @@ export default {
       username: '',
       password: '',
       incorrectAuth: false,
+      error: '',
     }
   },
   methods: {
     ...mapActions(['getTokens']),
     ...mapMutations(['destroyTokens']),
-    login() {
-      this.getTokens({
-        username: this.username,
-        password: this.password,
-      })
-        .then(() => {
-          this.$router.push({ name: 'domains' })
+    async login() {
+      try {
+        let response = await this.$auth.loginWith('local', {
+          data: {
+            username: this.username,
+            password: this.password,
+          },
         })
-        .catch((err) => {
-          console.log(err)
-          this.incorrectAuth = true
-          this.destroyTokens()
-        })
+
+        console.log('Logged In')
+        console.log(response)
+        console.log(this.$auth.loggedIn)
+      } catch (e) {
+        this.incorrectAuth = true
+        this.error = e
+      }
     },
   },
 }

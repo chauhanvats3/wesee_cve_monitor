@@ -86,7 +86,7 @@ def getPhoto():
 def getTechs(url):
     if url.startswith("https://") == False:
         url = "https://" + url
-    Headers = {"x-api-key": "wTTICpi0as1Hve1F2JjuG8qtAN361yFsavAsUSlQ"}
+    Headers = {"x-api-key": "vuHqW2NspF2jPNWhkQfFc35wV1MxQS7m3w8667Iu"}
     endpoint = "https://api.wappalyzer.com/v2/lookup/?urls=" + url
     response = requests.get(endpoint, headers=Headers)
     return response.json()

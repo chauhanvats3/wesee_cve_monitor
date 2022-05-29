@@ -20,37 +20,15 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Home',
   data() {
-    return {
-      isAuthenticated: this.$store.state.user.isAuthenticated,
-    }
-  } /*
-  async fetch() {
-    let status = await this.$store.dispatch('domains/getDomainsFromBackend')
-    if (status == 200) {
-      this.$router.push('/domains')
-    }
-  }, */,
-  async asyncData(context) {
-    /*    if (!context.store.state.user.isAuthenticated) {
-      context.store.dispatch('destroyTokens')
-      return 401
-    } */
-    console.log('started')
-    let status
-    status = await context.store.dispatch('getPing')
-    console.log(status)
-
-    if (status == 200 || status == 404) {
-      context.app.router.push('/domains')
-    }
+    return {}
   },
-  mounted() {
-    if (!this.isAuthenticated) this.$router.push('/')
+  computed: {
+    ...mapGetters(['isAuthenticated', 'loggedInUser']),
   },
 }
 </script>
@@ -133,9 +111,6 @@ export default {
       img
         width: 70%
         max-width: 500px
-
-    .login-wrap
-      .login
 
 
 @media screen and (min-width: $small) and (max-width: $medium)

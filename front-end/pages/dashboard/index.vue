@@ -18,19 +18,13 @@
 import { mapGetters } from 'vuex'
 
 export default {
+  middleware: 'auth',
+
   data() {
-    return {
-      isAuthenticated: this.$store.state.user.isAuthenticated,
-    }
+    return {}
   },
   computed: {
     ...mapGetters({ domains: 'domains/getAllDomains' }),
-  },
-  async asyncData(context) {
-    let status = await context.store.dispatch('domains/getDomainsFromBackend')
-    if (status != 200) {
-      context.app.router.push('/')
-    }
   },
 }
 </script>

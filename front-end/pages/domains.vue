@@ -2,6 +2,7 @@
   <div class="domains">
     <Nav />
     <div class="content">
+      {{ isAuthenticated }}
       <DomainCard
         v-for="(domainInfo, index) in domains"
         :key="index"
@@ -18,19 +19,14 @@
 import { mapGetters, mapState } from 'vuex'
 
 export default {
+  middleware: 'auth',
+
   data() {
-    return {
-      isAuthenticated: this.$store.state.user.isAuthenticated,
-    }
-  },
-  async asyncData(context) {
-    let status = await context.store.dispatch('domains/getDomainsFromBackend')
-    if (status != 200) {
-      context.app.router.push('/')
-    }
+    return {}
   },
   computed: {
     ...mapGetters({ domains: 'domains/getAllDomains' }),
+    ...mapGetters(['isAuthenticated']),
   },
 }
 </script>

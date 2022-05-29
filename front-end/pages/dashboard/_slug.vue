@@ -57,6 +57,8 @@
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
+  middleware: 'auth',
+
   data() {
     return {
       isAuthenticated: this.$store.state.user.isAuthenticated,
@@ -66,14 +68,6 @@ export default {
       newSubdomainName: '',
       isEditing: false,
     }
-  },
-  async asyncData(context) {
-    const slug = context.params.slug
-    let status = await context.store.dispatch('domains/getDomainsFromBackend')
-    if (status != 200) {
-      context.app.router.push('/')
-    }
-    return { slug, status }
   },
   async mounted() {
     this.enumSubdomains = this.domainInfo(this.slug).enumerate
