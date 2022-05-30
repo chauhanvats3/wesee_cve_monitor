@@ -32,7 +32,8 @@ export default {
     }),
   },
   async fetch() {
-    await this.getDomainsFromBackend()
+    let storedDomains = this.$store.getters['domains/getAllDomains']
+    if (storedDomains.length == 0) await this.getDomainsFromBackend()
   },
   fetchOnServer: false,
 }

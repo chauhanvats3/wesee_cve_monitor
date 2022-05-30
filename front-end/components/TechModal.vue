@@ -33,17 +33,16 @@
         </p>
       </div>
     </div>
-    <!--  <div class="cves">
-      <CVE v-for="(cve, index) in tech.cves" :key="index" :cve="cve" />
-    </div> -->
-    <virtual-list
+    <div class="cves">
+      <CVE v-for="(cve, index) in tech.cves" :key="index" :source="cve" />
+    </div>
+    <!-- <virtual-list
       class="cves"
       :data-key="'id'"
       :data-sources="tech.cves"
       :data-component="cveComponent"
       :keeps="noOfItems"
-      :estimate-size="sizeOfItem"
-    />
+    /> -->
   </div>
 </template>
 

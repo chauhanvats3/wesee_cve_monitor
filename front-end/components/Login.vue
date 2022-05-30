@@ -43,12 +43,7 @@ export default {
             username: this.username,
             password: this.password,
           },
-        }) /* 
-
-        console.log('Logged In')
-        console.log(response)
-        console.log(this.$auth.loggedIn)
-        console.log(this.$auth) */
+        })
       } catch (e) {
         this.incorrectAuth = true
         this.error = e

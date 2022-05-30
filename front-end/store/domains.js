@@ -19,6 +19,9 @@ export const mutations = {
   setDomains(state, data) {
     state.allDomains = data
   },
+  resetStore(state) {
+    state.allDomains = []
+  },
   addDomain(state, domainInfo) {
     let domain = { ...domainInfo }
     for (let i = 0; i < state.allDomains.length; i++) {

@@ -13,9 +13,13 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   methods: {
+    ...mapMutations({ resetData: 'domains/resetStore' }),
     async logout() {
+      this.resetData()
       await this.$auth.logout()
     },
   },

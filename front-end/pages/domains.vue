@@ -1,15 +1,18 @@
 <template>
   <div class="domains">
     <Nav />
-    <div class="content">
-      <DomainCard
-        v-for="(domainInfo, index) in domains"
-        :key="index"
-        :domainInfo="domainInfo"
-      />
-    </div>
-    <div class="newDomain">
-      <NewDomainCard />
+    <p v-if="$fetchState.pending">Fetching Domains...</p>
+    <div v-else>
+      <div class="content">
+        <DomainCard
+          v-for="(domainInfo, index) in domains"
+          :key="index"
+          :domainInfo="domainInfo"
+        />
+      </div>
+      <div class="newDomain">
+        <NewDomainCard />
+      </div>
     </div>
   </div>
 </template>
@@ -33,7 +36,11 @@ export default {
     }),
   },
   async fetch() {
-    await this.getDomainsFromBackend()
+    let storedDomains = this.$store.getters['domains/getAllDomains']
+    if (storedDomains.length == 0) {
+      console.log('Getting from BAckend')
+      await this.getDomainsFromBackend()
+    }
   },
   fetchOnServer: false,
 }
