@@ -51,8 +51,8 @@ export default {
   margin-top: 100px
   .content
     @include flexify-row
-    flex-wrap: wrap
-    justify-content: space-evenly
+    flex-wrap: wrap !important
+    justify-content: space-evenly !important
 
   .newDomain
     @include flexify-row

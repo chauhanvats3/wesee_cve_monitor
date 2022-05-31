@@ -36,6 +36,7 @@ def extractDataFromCVE(response):
 
 
 def getCVEs(technology, version):
+    print("Getting CVEs for : " + technology + " : " + version)
     if not version:
         version = "*"
     technology = technology.replace(" ", "_")
@@ -61,13 +62,11 @@ def getCVEs(technology, version):
         + "&resultsPerPage=200"
     )
 
-    print(endpoint1)
     response = requests.get(endpoint1)
     extraction = extractDataFromCVE(response)
     if extraction is not None:
         cves = cves + extraction
 
-    print(endpoint2)
     response = requests.get(endpoint2)
     extraction = extractDataFromCVE(response)
     if extraction is not None:
@@ -84,6 +83,7 @@ def getPhoto():
 
 
 def getTechs(url):
+    print("Getting Tech For : " + url)
     if url.startswith("https://") == False:
         url = "https://" + url
     Headers = {"x-api-key": "vuHqW2NspF2jPNWhkQfFc35wV1MxQS7m3w8667Iu"}
@@ -106,6 +106,7 @@ def verifyDomain(domainName, verifyCode):
 
 
 def findSubdomains(domainName):
+    print("Finding Subdomains : " + domainName)
     subdomainApi = "https://dns.bufferover.run/dns?q=." + domainName
     response = requests.get(subdomainApi)
     return response.json()

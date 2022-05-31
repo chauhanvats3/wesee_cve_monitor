@@ -151,14 +151,10 @@ export default {
   position: relative
   padding: 0 3.5%
   padding-top: 120px
-  ul
-    width: 100%
-    padding: 2% 5%
-    padding-bottom: 0
 
   .techs
     @include flexify-row
-    flex-wrap: wrap
+    flex-wrap: wrap !important
     margin: 50px 0
     padding: 0 2%
 

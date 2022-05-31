@@ -46,6 +46,7 @@ export default {
     for (let i = 0; i < subdomainsListed.length; i++) {
       if (subdomainsListed[i].techSearched != true) {
         this.getSubdomainTechs(subdomainsListed[i].id)
+        subdomainsListed[i].techSearched = true
       }
     }
   },
