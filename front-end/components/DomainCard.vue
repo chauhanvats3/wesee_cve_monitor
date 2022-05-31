@@ -140,11 +140,11 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-$top-row-height : 50px
+$top-row-height : 60px
 
 .domain-card
-    width: 550px
-    height: 350px
+    width: 650px
+    height: 400px
     border-radius: 15px
     margin: 50px 20px
     position: relative
@@ -191,7 +191,9 @@ $top-row-height : 50px
 
                 p
                     color: white
-                    font-size: 0.8rem
+                    font-size: 0.9rem
+                    padding: 10px
+
 
             .verify-btn
                 background: $main-color

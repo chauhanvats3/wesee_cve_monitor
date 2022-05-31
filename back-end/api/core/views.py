@@ -26,6 +26,11 @@ class DomainViewSet(viewsets.ModelViewSet):
         print(self.request.user)
         serializer.save(author=self.request.user)
 
+    def get_queryset(self):
+        queryset = self.queryset
+        query_set = queryset.filter(author=self.request.user)
+        return query_set
+
     @action(detail=True, methods=["post"])
     def verify(self, request, pk):
         thisDomain = self.get_object()
@@ -105,26 +110,6 @@ class DomainViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             self.perform_update(serializer)
         return Response(data_to_change)
-
-    @action(detail=True, methods=["post"])
-    def getPhoto(self, request, pk):
-        thisDomain = self.get_object()
-        thisObject = serializers.serialize(
-            "json",
-            [
-                thisDomain,
-            ],
-        )
-        struct = json.loads(thisObject)[0]
-        fullName = struct["fields"]["full_name"]
-        verificationNumber = struct["fields"]["verify_code"]
-        name = fullName.split("://")[1]
-        photoUrl = getPhoto()
-        data_to_change = {"photo": photoUrl}
-        serializer = DomainSerializer(thisDomain, data=data_to_change, partial=True)
-        if serializer.is_valid():
-            self.perform_update(serializer)
-        return Response(serializer.data)
 
 
 class SubdomainViewSet(viewsets.ModelViewSet):
