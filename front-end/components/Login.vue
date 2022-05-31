@@ -34,9 +34,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getTokens']),
-    ...mapMutations(['destroyTokens']),
+    ...mapMutations({ resetData: 'domains/resetStore' }),
+
     async login() {
+      this.resetData()
       try {
         let response = await this.$auth.loginWith('local', {
           data: {

@@ -30,7 +30,7 @@
             name="enumerate"
             id="enumChkbx"
             ref="chkbxEnum"
-            v-model="enumSubdomains"
+            v-model="enumerate"
           />
           <p
             @click="checkBoxClick"
@@ -54,20 +54,17 @@
         </div>
       </div>
       <Subdomains
-        v-if="enumSubdomains"
+        v-if="enumerate"
         :domain="slug"
         v-on:sub-pill-clicked="openSubTechDetails"
       />
-      <ExcludedSubdomains
-        :domain="slug"
-        v-if="enumSubdomains && excludedExist"
-      />
+      <ExcludedSubdomains :domain="slug" v-if="enumerate && excludedExist" />
     </div>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 
 export default {
   middleware: 'auth',
@@ -106,11 +103,22 @@ export default {
       let excludedSubdomains = this.getExcluded(this.slug)
       return excludedSubdomains.length == 0 ? false : true
     },
+    enumerate: {
+      get() {
+        return this.domainInfo(this.slug, 'enumerate')
+      },
+      set() {
+        this.enumToggle(this.slug)
+      },
+    },
   },
   methods: {
     ...mapActions({
       subdomainToBackend: 'domains/addSubdomainToBackend',
       getDomainsFromBackend: 'domains/getDomainsFromBackend',
+    }),
+    ...mapMutations({
+      enumToggle: 'domains/enumToggle',
     }),
     openTechDetails(tech) {
       this.techToOpen = tech
@@ -124,7 +132,7 @@ export default {
       this.$refs.techModalWrapper.classList.remove('show')
     },
     checkBoxClick() {
-      this.enumSubdomains = !this.enumSubdomains
+      this.enumToggle(this.slug)
     },
     addSubdomain() {
       let name = this.newSubdomainName.split('://').pop()

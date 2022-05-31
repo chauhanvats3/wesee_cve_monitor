@@ -1,7 +1,10 @@
+from pickle import TRUE
+import random
 from urllib import request
 from django.db import models
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.backends import TokenBackend
+from .utilities import getPhoto, getTechs, getCVEs, findSubdomains
 
 
 from .utilities import getCVEs
@@ -65,9 +68,29 @@ class Subdomain(models.Model):
     name = models.CharField(max_length=50)
     include = models.BooleanField(default=True)
     techs = models.ManyToManyField(Tech)
+    techs_fetched = models.BooleanField(default=False)
 
     def __str__(self):
         return "%s" % (self.name)
+
+    def save(self, *args, **kwargs):
+        super(Subdomain, self).save(*args, **kwargs)
+        for old_techs in self.techs.all():
+            old_techs.delete()
+
+        try:
+            response = getTechs(self.name)
+            for tech in response[0]["technologies"]:
+                randColor = "%06x" % random.randint(0, 0xFFFFFF)
+                arr = {"arr": tech["versions"]}
+                tech = self.techs.create(
+                    name=tech["name"], versions=arr, color=randColor
+                )
+                self.techs.add(tech)
+        except:
+            print("No techs Found")
+
+        self.techs_fetched = True
 
 
 class Domain(models.Model):
@@ -77,8 +100,9 @@ class Domain(models.Model):
     subdomains = models.ManyToManyField(Subdomain, blank=True)
     techs = models.ManyToManyField(Tech, blank=True)
     verify_code = models.PositiveIntegerField()
-    photo = models.CharField(blank=True, max_length=350)
+    photo = models.CharField(max_length=550, blank=True)
     author = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
+    saved_already = models.BooleanField(default=False)
 
     @property
     def name(self):
@@ -91,14 +115,37 @@ class Domain(models.Model):
     def __str__(self):
         return "%s : %s" % (self.name, self.protocol)
 
-
-"""     def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):
+        if self._state.adding == True:
+            # get PHOTO on Create Only
+            photoUrl = getPhoto()
+            self.photo = photoUrl
+            print("Photo Added : " + photoUrl)
         super(Domain, self).save(*args, **kwargs)
-        token = request.META.get("HTTP_AUTHORIZATION", " ").split(" ")[1]
-        data = {"token": token}
-        try:
-            valid_data = TokenBackend(algorithm="HS256").decode(token, verify=True)
-            user = valid_data["user"]
-        except:
-            print("validation error")
-        self.author = user """
+
+        if self.techs.count() == 0:
+            # get Subdomains
+            subdomainsResponse = findSubdomains(self.name)
+            print(subdomainsResponse)
+            try:
+                for subdomain in subdomainsResponse["FDNS_A"]:
+                    subdomainName = subdomain.split(",")[1]
+                    subdomain = self.subdomains.create(name=subdomainName, include=True)
+                    self.subdomains.add(subdomain)
+            except:
+                print("Subdomains Not Found")
+            print("Subdomains Added")
+
+            # get TECHS
+            techResponse = getTechs(self.full_name)
+            try:
+                for tech in techResponse[0]["technologies"]:
+                    randColor = "%06x" % random.randint(0, 0xFFFFFF)
+                    arr = {"arr": tech["versions"]}
+                    tech = self.techs.create(
+                        name=tech["name"], versions=arr, color=randColor
+                    )
+                    self.techs.add(tech)
+            except:
+                print("Techs Not Found")
+            print("Techs Added for " + self.name)

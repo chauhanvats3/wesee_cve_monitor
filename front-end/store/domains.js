@@ -16,6 +16,14 @@ export const mutations = {
       }
     }
   },
+  enumToggle(state, info) {
+    let domains = state.allDomains
+    for (let i = 0; i < domains.length; i++) {
+      if (domains[i].name == info) {
+        state.allDomains[i].enumerate = !state.allDomains[i].enumerate
+      }
+    }
+  },
   setDomains(state, data) {
     state.allDomains = data
   },
@@ -24,19 +32,16 @@ export const mutations = {
   },
   addDomain(state, domainInfo) {
     let domain = { ...domainInfo }
-    for (let i = 0; i < state.allDomains.length; i++) {
-      let thisDomain = state.allDomains[i]
-      if (thisDomain.id == domain.id) {
-        state.allDomains[i] = domain
-        console.log('Updating')
-        console.log(state.allDomains)
-        return
-      }
-    }
-    console.log('Adding New')
     domain.name = domainInfo.full_name.split('://')[1]
     domain.verified = false
     state.allDomains.push(domain)
+  },
+  updateDomain(state, domainInfo) {
+    for (let i = 0; i < state.allDomains.length; i++) {
+      if (state.allDomains[i].name == domainInfo.name)
+        state.allDomains[i] = domainInfo
+      return
+    }
   },
   removeDomain(state, domainId) {
     let domains = state.allDomains
@@ -51,7 +56,7 @@ export const mutations = {
     let domains = state.allDomains
     for (let i = 0; i < domains.length; i++) {
       if (domains[i].id == info.id) {
-        domains[i].subdomains.push(info.subdomain)
+        state.allDomains[i].subdomains.push(info.subdomain)
       }
     }
   },
@@ -108,13 +113,14 @@ export const actions = {
     let domainId = ''
     let errors = []
     try {
-      let info = await this.$axios.$post('/domains/', domainInfo)
-      domainInfo.id = info.id
       context.commit('addDomain', domainInfo)
+      let info = await this.$axios.$post('/domains/', domainInfo)
+      domainInfo = info
+      context.commit('updateDomain', domainInfo)
     } catch (error) {
       return error
     }
-    try {
+    /* try {
       let photoRes = await this.$axios.$post(
         `/domains/${domainInfo.id}/getPhoto/`
       )
@@ -138,7 +144,7 @@ export const actions = {
       context.commit('addDomain', domainInfo)
     } catch (error) {
       errors.push(error)
-    }
+    } */
 
     if (errors.length > 0) return errors
     return 200
@@ -220,7 +226,6 @@ export const actions = {
 
 export const getters = {
   getDomainInfo: (state) => (domainName, infoAsked) => {
-    console.log(domainName)
     let domains = state.allDomains
     for (let i = 0; i < domains.length; i++) {
       if (domains[i].name.includes(domainName)) {

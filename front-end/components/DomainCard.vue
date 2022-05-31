@@ -125,6 +125,7 @@ export default {
       }, 500)
     },
     async deleteDomain() {
+      if (!this.domainInfo.verified) this.closeVerifyInstructions()
       let status = await this.deleteThisDomain(this.domainInfo.name)
     },
     async verifyDomain() {

@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { mapMutations, mapActions } from 'vuex'
+import { mapMutations, mapActions, mapGetters } from 'vuex'
 
 export default {
   data() {
@@ -42,6 +42,7 @@ export default {
   methods: {
     ...mapMutations(['addDomain']),
     ...mapActions({ domainToServer: 'domains/addDomainToBackend' }),
+    ...mapGetters({ allDomains: 'domains/getAllDomains' }),
     openOverlay() {
       this.$refs.overlay.classList.add('show')
     },
@@ -54,7 +55,9 @@ export default {
     },
     addNewDomain() {
       let domainName = this.$refs.domainInput.value
-      if (!domainName.startsWith('http')) domainName = 'https://' + domainName
+      if (domainName.indexOf('www.') != -1)
+        domainName = domainName.split('www.')[1]
+      if (!domainName.startsWith('https')) domainName = 'https://' + domainName
       let domainInfo = {
         full_name: domainName,
         enumerate: this.$refs.checkbox.checked,
@@ -62,6 +65,16 @@ export default {
           Math.floor(Math.random() * (this.maxNum - this.minNum)) + this.minNum,
         subdomains: [],
         techs: [],
+        name: domainName.split('://')[1],
+        verified: false,
+      }
+
+      let domains = this.allDomains()
+      for (let i = 0; i < domains.length; i++) {
+        if (domains[i].full_name == domainInfo.full_name) {
+          console.log('Domain Exists')
+          return
+        }
       }
 
       let status = this.domainToServer(domainInfo)

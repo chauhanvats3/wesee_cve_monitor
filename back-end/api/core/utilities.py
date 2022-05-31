@@ -77,7 +77,7 @@ def getCVEs(technology, version):
 
 def getPhoto():
     response = requests.get(
-        "https://api.unsplash.com/photos/random?client_id=mjxmWdfEkErf3EYA66iggKKsgywYcrsy5P7ABqJ5-hE"
+        "https://api.unsplash.com/photos/random?orientation=squarish&content_filter=high&client_id=mjxmWdfEkErf3EYA66iggKKsgywYcrsy5P7ABqJ5-hE"
     )
     return response.json()["urls"]["regular"]
 
@@ -86,9 +86,10 @@ def getTechs(url):
     print("Getting Tech For : " + url)
     if url.startswith("https://") == False:
         url = "https://" + url
-    Headers = {"x-api-key": "vuHqW2NspF2jPNWhkQfFc35wV1MxQS7m3w8667Iu"}
+    Headers = {"x-api-key": "UzabMAgDjMaVcSHKBlwwQ4VS1g5Tl08e3VxEIRH1"}
     endpoint = "https://api.wappalyzer.com/v2/lookup/?urls=" + url
     response = requests.get(endpoint, headers=Headers)
+    print(response.json())
     return response.json()
 
 

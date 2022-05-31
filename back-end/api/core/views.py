@@ -132,37 +132,6 @@ class SubdomainViewSet(viewsets.ModelViewSet):
     serializer_class = SubdomainSerializer
     queryset = Subdomain.objects.all()
 
-    @action(detail=True, methods=["post"])
-    def findTech(self, request, pk):
-        thisSubdomain = self.get_object()
-        thisObject = serializers.serialize(
-            "json",
-            [
-                thisSubdomain,
-            ],
-        )
-        struct = json.loads(thisObject)[0]
-        subDomain = struct["fields"]["name"]
-        response = getTechs(subDomain)
-        techs = []
-        for tech in response[0]["technologies"]:
-            randColor = "%06x" % random.randint(0, 0xFFFFFF)
-            techs.append(
-                {
-                    "name": tech["name"],
-                    "versions": {"arr": tech["versions"]},
-                    "cves": [],
-                    "color": randColor,
-                }
-            )
-        data_to_change = {"techs": techs}
-        serializer = SubdomainSerializer(
-            thisSubdomain, data=data_to_change, partial=True
-        )
-        if serializer.is_valid():
-            self.perform_update(serializer)
-        return Response(serializer.data)
-
 
 class TechViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
