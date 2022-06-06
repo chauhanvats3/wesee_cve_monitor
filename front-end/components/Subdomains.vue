@@ -17,7 +17,7 @@
             </p>
           </div>
         </div>
-        <div class="techs">
+        <div class="techs" v-if="subdomain.techs.length > 0">
           <TechPill
             v-for="(tech, index2) in subdomain.techs"
             :key="index2"
@@ -27,6 +27,7 @@
             "
           />
         </div>
+        <div v-else class="tech_not_found"><p>No Technologies Found</p></div>
       </div>
     </div>
   </div>
@@ -84,4 +85,13 @@ export default {
         .techs
             @include flexify-row
             flex-wrap: wrap
+            margin-top: 40px
+        .tech_not_found
+            @include flexify
+            margin-top: 90px
+            text-transform: uppercase
+            font-size: 2rem
+            color: #aaa
+            letter-spacing: 0.3rem
+            word-spacing: 1rem
 </style>

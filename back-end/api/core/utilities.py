@@ -62,18 +62,17 @@ def getCVEs(technology, version):
         + "&resultsPerPage=200"
     )
 
-    print(endpoint1)
     response = requests.get(endpoint1)
-    print("Endpoint 1")
     extraction = extractDataFromCVE(response)
     if extraction is not None:
         cves = cves + extraction
 
     response = requests.get(endpoint2)
-    print("endpoint2")
     extraction = extractDataFromCVE(response)
     if extraction is not None:
         cves = cves + extraction
+
+    print("got cves for : " + technology)
 
     return cves
 
@@ -92,7 +91,7 @@ def getTechs(url):
     Headers = {"x-api-key": "mGjOVs9wXmiWrEyVgE5S1kqE768WBLG1aouXlfl0"}
     endpoint = "https://api.wappalyzer.com/v2/lookup/?urls=" + url
     response = requests.get(endpoint, headers=Headers)
-    print(response.json())
+    print("Got Tech For : " + url)
     return response.json()
 
 
@@ -113,4 +112,5 @@ def findSubdomains(domainName):
     print("Finding Subdomains : " + domainName)
     subdomainApi = "https://dns.bufferover.run/dns?q=." + domainName
     response = requests.get(subdomainApi)
+    print("Got subdomains for : " + domainName)
     return response.json()

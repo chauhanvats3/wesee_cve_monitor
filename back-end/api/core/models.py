@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.backends import TokenBackend
 from .utilities import getPhoto, getTechs, getCVEs, findSubdomains
-from .tasks import async_get_domain_data, async_get_cve
+from .tasks import async_get_domain_data
 
 
 from .utilities import getCVEs
@@ -43,7 +43,6 @@ class Tech(models.Model):
 
     def save(self, *args, **kwargs):
         super(Tech, self).save(*args, **kwargs)
-        # async_get_cve.delay(self.id)
         for old_cve in self.cves.all():
             old_cve.delete()
         versions = self.versions["arr"]
@@ -125,34 +124,3 @@ class Domain(models.Model):
             print("Photo Added : " + photoUrl)
         super(Domain, self).save(*args, **kwargs)
         async_get_domain_data.delay(self.id)
-
-        # do if new domain
-        # if self.techs.count() == 0:
-        # Async Get Photos
-        # async_get_domain_data.delay(self.id)
-
-        """# get Subdomains
-            subdomainsResponse = findSubdomains(self.name)
-            print(subdomainsResponse)
-            try:
-                for subdomain in subdomainsResponse["FDNS_A"]:
-                    subdomainName = subdomain.split(",")[1]
-                    subdomain = self.subdomains.create(name=subdomainName, include=True)
-                    self.subdomains.add(subdomain)
-            except:
-                print("Subdomains Not Found")
-            print("Subdomains Added")
-
-            # get TECHS
-            techResponse = getTechs(self.full_name)
-            try:
-                for tech in techResponse[0]["technologies"]:
-                    randColor = "%06x" % random.randint(0, 0xFFFFFF)
-                    arr = {"arr": tech["versions"]}
-                    tech = self.techs.create(
-                        name=tech["name"], versions=arr, color=randColor
-                    )
-                    self.techs.add(tech)
-            except:
-                print("Techs Not Found")
-            print("Techs Added for " + self.name)"""

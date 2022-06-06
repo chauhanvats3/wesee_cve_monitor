@@ -197,7 +197,6 @@ export const actions = {
     }
   },
   async toggleEnumeration(context, info) {
-    console.log(info)
     try {
       await this.$axios.$patch(`/domains/${info.id}/`, {
         enumerate: !info.enumerate,
@@ -271,7 +270,6 @@ export const getters = {
   getTech: (state) => (techId) => {
     let domains = state.allDomains
     for (let i = 0; domains.length; i++) {
-      console.log(domains[i])
       let subdomains = domains[i].subdomains
       let domainTechs = domains[i].techs
       for (let j = 0; j < domainTechs.length; j++) {
