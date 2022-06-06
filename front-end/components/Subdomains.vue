@@ -9,6 +9,9 @@
         <div class="top-bar">
           <h3>{{ subdomain.name }}</h3>
           <div class="options">
+            <p class="getTech" @click.stop="getSubdomainTechs(subdomain.id)">
+              refresh
+            </p>
             <p class="exclude" @click.stop="toggleExclusion(subdomain.name)">
               exclude
             </p>
@@ -34,6 +37,7 @@ import { mapGetters, mapMutations, mapActions } from 'vuex'
 
 export default {
   props: ['domain'],
+
   computed: {
     ...mapGetters('domains', ['getSubdomains']),
   },

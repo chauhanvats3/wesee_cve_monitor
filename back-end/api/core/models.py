@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.backends import TokenBackend
 from .utilities import getPhoto, getTechs, getCVEs, findSubdomains
+from .tasks import async_get_domain_data, async_get_cve
 
 
 from .utilities import getCVEs
@@ -42,6 +43,7 @@ class Tech(models.Model):
 
     def save(self, *args, **kwargs):
         super(Tech, self).save(*args, **kwargs)
+        # async_get_cve.delay(self.id)
         for old_cve in self.cves.all():
             old_cve.delete()
         versions = self.versions["arr"]
@@ -122,9 +124,14 @@ class Domain(models.Model):
             self.photo = photoUrl
             print("Photo Added : " + photoUrl)
         super(Domain, self).save(*args, **kwargs)
+        async_get_domain_data.delay(self.id)
 
-        if self.techs.count() == 0:
-            # get Subdomains
+        # do if new domain
+        # if self.techs.count() == 0:
+        # Async Get Photos
+        # async_get_domain_data.delay(self.id)
+
+        """# get Subdomains
             subdomainsResponse = findSubdomains(self.name)
             print(subdomainsResponse)
             try:
@@ -148,4 +155,4 @@ class Domain(models.Model):
                     self.techs.add(tech)
             except:
                 print("Techs Not Found")
-            print("Techs Added for " + self.name)
+            print("Techs Added for " + self.name)"""

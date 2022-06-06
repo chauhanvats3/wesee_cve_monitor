@@ -16,10 +16,10 @@ export const mutations = {
       }
     }
   },
-  enumToggle(state, info) {
+  enumToggle(state, domainName) {
     let domains = state.allDomains
     for (let i = 0; i < domains.length; i++) {
-      if (domains[i].name == info) {
+      if (domains[i].name == domainName) {
         state.allDomains[i].enumerate = !state.allDomains[i].enumerate
       }
     }
@@ -110,7 +110,6 @@ export const actions = {
     return 200
   },
   async addDomainToBackend(context, domainInfo) {
-    let domainId = ''
     let errors = []
     try {
       context.commit('addDomain', domainInfo)
@@ -120,31 +119,6 @@ export const actions = {
     } catch (error) {
       return error
     }
-    /* try {
-      let photoRes = await this.$axios.$post(
-        `/domains/${domainInfo.id}/getPhoto/`
-      )
-      domainInfo.photo = photoRes.photo
-      context.commit('addDomain', domainInfo)
-    } catch (error) {
-      errors.push(error)
-    }
-    try {
-      let enumRes = await this.$axios.$post(
-        `/domains/${domainInfo.id}/enumSubdomains/`
-      )
-      context.commit('addDomain', domainInfo)
-    } catch (error) {
-      errors.push(error)
-    }
-    try {
-      let techRes = await this.$axios.$post(
-        `/domains/${domainInfo.id}/findTech/`
-      )
-      context.commit('addDomain', domainInfo)
-    } catch (error) {
-      errors.push(error)
-    } */
 
     if (errors.length > 0) return errors
     return 200
@@ -221,6 +195,19 @@ export const actions = {
     } catch (error) {
       return error
     }
+  },
+  async toggleEnumeration(context, info) {
+    console.log(info)
+    try {
+      await this.$axios.$patch(`/domains/${info.id}/`, {
+        enumerate: !info.enumerate,
+      })
+    } catch (e) {
+      console.log('Error Occurred')
+      console.log(e)
+    }
+
+    context.commit('enumToggle', info.name)
   },
 }
 

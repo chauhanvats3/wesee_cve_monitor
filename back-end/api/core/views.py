@@ -13,7 +13,7 @@ from .serializers import (
     TechSerializer,
     CVESerializer,
 )
-from .utilities import findSubdomains, getCVEs, getPhoto, getTechs, verifyDomain
+from .utilities import findSubdomains, getTechs, verifyDomain
 from .models import Domain, Subdomain, Tech, CVE
 
 
@@ -23,7 +23,6 @@ class DomainViewSet(viewsets.ModelViewSet):
     queryset = Domain.objects.all()
 
     def perform_create(self, serializer):
-        print(self.request.user)
         serializer.save(author=self.request.user)
 
     def get_queryset(self):
@@ -116,6 +115,42 @@ class SubdomainViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = SubdomainSerializer
     queryset = Subdomain.objects.all()
+
+    @action(detail=True, methods=["post"])
+    def findTech(self, request, pk):
+
+        subdomain = self.get_object()
+
+        thisObject = serializers.serialize(
+            "json",
+            [
+                subdomain,
+            ],
+        )
+        struct = json.loads(thisObject)[0]
+        response = None
+        techs = []
+        name = struct["fields"]["name"]
+
+        try:
+            response = getTechs(name)
+        except:
+            response = []
+        for tech in response[0]["technologies"]:
+            randColor = "%06x" % random.randint(0, 0xFFFFFF)
+            techs.append(
+                {
+                    "name": tech["name"],
+                    "versions": {"arr": tech["versions"]},
+                    "cves": [],
+                    "color": randColor,
+                }
+            )
+        data_to_change = {"techs": techs}
+        serializer = SubdomainSerializer(subdomain, data=data_to_change, partial=True)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+        return Response(data_to_change)
 
 
 class TechViewSet(viewsets.ModelViewSet):

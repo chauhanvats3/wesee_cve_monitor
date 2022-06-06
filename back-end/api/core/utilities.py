@@ -62,12 +62,15 @@ def getCVEs(technology, version):
         + "&resultsPerPage=200"
     )
 
+    print(endpoint1)
     response = requests.get(endpoint1)
+    print("Endpoint 1")
     extraction = extractDataFromCVE(response)
     if extraction is not None:
         cves = cves + extraction
 
     response = requests.get(endpoint2)
+    print("endpoint2")
     extraction = extractDataFromCVE(response)
     if extraction is not None:
         cves = cves + extraction
@@ -86,7 +89,7 @@ def getTechs(url):
     print("Getting Tech For : " + url)
     if url.startswith("https://") == False:
         url = "https://" + url
-    Headers = {"x-api-key": "UzabMAgDjMaVcSHKBlwwQ4VS1g5Tl08e3VxEIRH1"}
+    Headers = {"x-api-key": "mGjOVs9wXmiWrEyVgE5S1kqE768WBLG1aouXlfl0"}
     endpoint = "https://api.wappalyzer.com/v2/lookup/?urls=" + url
     response = requests.get(endpoint, headers=Headers)
     print(response.json())
