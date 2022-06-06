@@ -15,6 +15,7 @@ from .serializers import (
 )
 from .utilities import findSubdomains, getTechs, verifyDomain
 from .models import Domain, Subdomain, Tech, CVE
+from .tasks import async_get_subdomain_techs
 
 
 class DomainViewSet(viewsets.ModelViewSet):
@@ -118,8 +119,11 @@ class SubdomainViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def findTech(self, request, pk):
+        print("Async Tech Update Received")
+        async_get_subdomain_techs.delay(pk)
+        return Response("Updating Subdomain Techs")
 
-        subdomain = self.get_object()
+        """ subdomain = self.get_object()
 
         thisObject = serializers.serialize(
             "json",
@@ -150,7 +154,7 @@ class SubdomainViewSet(viewsets.ModelViewSet):
         serializer = SubdomainSerializer(subdomain, data=data_to_change, partial=True)
         if serializer.is_valid():
             self.perform_update(serializer)
-        return Response(data_to_change)
+        return Response(data_to_change) """
 
 
 class TechViewSet(viewsets.ModelViewSet):

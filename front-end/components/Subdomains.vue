@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     ...mapMutations({ excludeToggle: 'domains/excludeToggle' }),
-    ...mapActions({ getTechs: 'domains/getTechs' }),
+    ...mapActions({ getTechs: 'domains/getSubdomainTechs' }),
     subPillClicked(info) {
       this.$emit('sub-pill-clicked', info)
     },

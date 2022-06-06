@@ -175,7 +175,7 @@ export const actions = {
     }
     return 200
   },
-  async getTechs(context, id) {
+  async getSubdomainTechs(context, id) {
     let techRes = {}
     try {
       techRes = await this.$axios.$post(`/subdomains/${id}/findTech/`)

@@ -1,4 +1,5 @@
 import requests
+import time
 
 
 def extractDataFromCVE(response):
@@ -88,7 +89,7 @@ def getTechs(url):
     print("Getting Tech For : " + url)
     if url.startswith("https://") == False:
         url = "https://" + url
-    Headers = {"x-api-key": "mGjOVs9wXmiWrEyVgE5S1kqE768WBLG1aouXlfl0"}
+    Headers = {"x-api-key": "ckC7d24CNN8MWObSSmZri2vtGrpb9cfP7R8eCdDn"}
     endpoint = "https://api.wappalyzer.com/v2/lookup/?urls=" + url
     response = requests.get(endpoint, headers=Headers)
     print("Got Tech For : " + url)

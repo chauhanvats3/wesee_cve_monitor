@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.backends import TokenBackend
 from .utilities import getPhoto, getTechs, getCVEs, findSubdomains
-from .tasks import async_get_domain_data
+from .tasks import async_get_domain_data, async_get_subdomain_techs
 
 
 from .utilities import getCVEs
@@ -51,6 +51,7 @@ class Tech(models.Model):
             version = ""
         else:
             version = versions[0]
+
         response = getCVEs(self.name, version)
         for eachCVE in response:
             arr = {"arr": eachCVE["references"]}
@@ -76,7 +77,9 @@ class Subdomain(models.Model):
 
     def save(self, *args, **kwargs):
         super(Subdomain, self).save(*args, **kwargs)
-        for old_techs in self.techs.all():
+        async_get_subdomain_techs.delay(self.id)
+
+        """ for old_techs in self.techs.all():
             old_techs.delete()
 
         try:
@@ -89,9 +92,9 @@ class Subdomain(models.Model):
                 )
                 self.techs.add(tech)
         except:
-            print("No techs Found")
+            print("No techs Found") 
 
-        self.techs_fetched = True
+        self.techs_fetched = True"""
 
 
 class Domain(models.Model):
