@@ -79,23 +79,6 @@ class Subdomain(models.Model):
         super(Subdomain, self).save(*args, **kwargs)
         async_get_subdomain_techs.delay(self.id)
 
-        """ for old_techs in self.techs.all():
-            old_techs.delete()
-
-        try:
-            response = getTechs(self.name)
-            for tech in response[0]["technologies"]:
-                randColor = "%06x" % random.randint(0, 0xFFFFFF)
-                arr = {"arr": tech["versions"]}
-                tech = self.techs.create(
-                    name=tech["name"], versions=arr, color=randColor
-                )
-                self.techs.add(tech)
-        except:
-            print("No techs Found") 
-
-        self.techs_fetched = True"""
-
 
 class Domain(models.Model):
     full_name = models.URLField(unique=True)

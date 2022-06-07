@@ -56,61 +56,6 @@ class DomainViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-    @action(detail=True, methods=["post"])
-    def enumSubdomains(self, request, pk):
-        thisDomain = self.get_object()
-        thisObject = serializers.serialize(
-            "json",
-            [
-                thisDomain,
-            ],
-        )
-        struct = json.loads(thisObject)[0]
-        fullName = struct["fields"]["full_name"]
-        name = fullName.split("://")[1]
-        jawab = findSubdomains(name)
-        newSubdomains = []
-        try:
-            for subdomain in jawab["FDNS_A"]:
-                useful = subdomain.split(",")[1]
-                newSubdomains.append({"techs": [], "name": useful, "include": "true"})
-        except:
-            newSubdomains = []
-        data_to_change = {"subdomains": newSubdomains}
-        serializer = DomainSerializer(thisDomain, data=data_to_change, partial=True)
-        if serializer.is_valid():
-            self.perform_update(serializer)
-        return Response(serializer.data)
-
-    @action(detail=True, methods=["post"])
-    def findTech(self, request, pk):
-        thisDomain = self.get_object()
-        thisObject = serializers.serialize(
-            "json",
-            [
-                thisDomain,
-            ],
-        )
-        struct = json.loads(thisObject)[0]
-        fullName = struct["fields"]["full_name"]
-        response = getTechs(fullName)
-        techs = []
-        for tech in response[0]["technologies"]:
-            randColor = "%06x" % random.randint(0, 0xFFFFFF)
-            techs.append(
-                {
-                    "name": tech["name"],
-                    "versions": {"arr": tech["versions"]},
-                    "cves": [],
-                    "color": randColor,
-                }
-            )
-        data_to_change = {"techs": techs}
-        serializer = DomainSerializer(thisDomain, data=data_to_change, partial=True)
-        if serializer.is_valid():
-            self.perform_update(serializer)
-        return Response(data_to_change)
-
 
 class SubdomainViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
@@ -122,39 +67,6 @@ class SubdomainViewSet(viewsets.ModelViewSet):
         print("Async Tech Update Received")
         async_get_subdomain_techs.delay(pk)
         return Response("Updating Subdomain Techs")
-
-        """ subdomain = self.get_object()
-
-        thisObject = serializers.serialize(
-            "json",
-            [
-                subdomain,
-            ],
-        )
-        struct = json.loads(thisObject)[0]
-        response = None
-        techs = []
-        name = struct["fields"]["name"]
-
-        try:
-            response = getTechs(name)
-        except:
-            response = []
-        for tech in response[0]["technologies"]:
-            randColor = "%06x" % random.randint(0, 0xFFFFFF)
-            techs.append(
-                {
-                    "name": tech["name"],
-                    "versions": {"arr": tech["versions"]},
-                    "cves": [],
-                    "color": randColor,
-                }
-            )
-        data_to_change = {"techs": techs}
-        serializer = SubdomainSerializer(subdomain, data=data_to_change, partial=True)
-        if serializer.is_valid():
-            self.perform_update(serializer)
-        return Response(data_to_change) """
 
 
 class TechViewSet(viewsets.ModelViewSet):

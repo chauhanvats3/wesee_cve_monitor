@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.signals import pre_save, post_save, pre_delete
 from django.dispatch import receiver
 from .utilities import getCVEs
+from django_celery_beat.models import PeriodicTask
 
 
 from .models import Domain, Subdomain, Tech, CVE
@@ -13,6 +14,10 @@ def cascadeDeleteDomain(sender, instance, **kwargs):
         subdomain.delete()
     for tech in instance.techs.all():
         tech.delete()
+    taskQuery = "Updating " + str(instance.id) + " CVEs"
+    periodicTasks = PeriodicTask.objects.filter(name=taskQuery)
+    for task in periodicTasks:
+        task.delete()
 
 
 @receiver(pre_delete, sender=Subdomain)
