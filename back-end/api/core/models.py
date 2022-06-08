@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.backends import TokenBackend
 from .utilities import getPhoto, getTechs, getCVEs, findSubdomains
-from .tasks import async_get_domain_data, async_get_subdomain_techs
+from .tasks import async_get_domain_data, async_get_subdomain_techs, async_get_tech_cves
 
 
 from .utilities import getCVEs
@@ -20,9 +20,11 @@ class CVE(models.Model):
     score = models.CharField(max_length=5)
     references = models.JSONField(default=json_default)
     tech_id = models.CharField(max_length=5)
+    cve_id = models.CharField(max_length=50, default="")
+    isNew = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.description
+        return self.cve_id
 
     def save(self, *args, **kwargs):
         super(CVE, self).save(*args, **kwargs)
@@ -43,8 +45,12 @@ class Tech(models.Model):
 
     def save(self, *args, **kwargs):
         super(Tech, self).save(*args, **kwargs)
+        async_get_tech_cves.delay(self.id)
+        """ oldCVEs = []
         for old_cve in self.cves.all():
+            oldCVEs.append({"cve_id": old_cve.cve_id})
             old_cve.delete()
+
         versions = self.versions["arr"]
         version = ""
         if not versions:
@@ -53,17 +59,25 @@ class Tech(models.Model):
             version = versions[0]
 
         response = getCVEs(self.name, version)
+
         for eachCVE in response:
+            isThisNew = True
+            for old in oldCVEs:
+                if old["cve_id"] == eachCVE["cve_id"]:
+                    isThisNew = False
+                    break
             arr = {"arr": eachCVE["references"]}
             cve = None
             cve = self.cves.create(
                 description=eachCVE["description"],
                 severity=eachCVE["severity"],
                 score=eachCVE["score"],
+                cve_id=eachCVE["cve_id"],
                 references=arr,
+                isNew=isThisNew,
                 tech_id=self.id,
             )
-            self.cves.add(cve)
+            self.cves.add(cve) """
 
 
 class Subdomain(models.Model):

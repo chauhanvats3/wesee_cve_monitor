@@ -36,13 +36,6 @@
     <div class="cves">
       <CVE v-for="(cve, index) in tech.cves" :key="index" :source="cve" />
     </div>
-    <!-- <virtual-list
-      class="cves"
-      :data-key="'id'"
-      :data-sources="tech.cves"
-      :data-component="cveComponent"
-      :keeps="noOfItems"
-    /> -->
   </div>
 </template>
 

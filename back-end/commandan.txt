@@ -1,1 +1,5 @@
 python manage.py runserver 104.248.175.4:8000
+celery --app api worker --pool=gevent --concurrency=500
+celery -A api beat -l info -S django
+redis-server
+python manage.py migrate django_celery_beat

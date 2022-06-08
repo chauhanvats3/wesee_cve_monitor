@@ -9,7 +9,7 @@ from .periodic import update_domain_two_hours
 
 
 @shared_task
-def async_save_subdomains(domainId, subdomainName):
+def async_create_subdomains(domainId, subdomainName):
     print("async save subdomains : " + subdomainName)
     domainModel = apps.get_model(app_label="core", model_name="Domain")
     thisDomain = domainModel.objects.get(pk=domainId)
@@ -18,7 +18,7 @@ def async_save_subdomains(domainId, subdomainName):
 
 
 @shared_task
-def async_save_domain_tech(domainId, techName, localversions):
+def async_create_domain_tech(domainId, techName, localversions):
     print("Save Domain Tech : " + techName)
     domainModel = apps.get_model(app_label="core", model_name="Domain")
     thisDomain = domainModel.objects.get(pk=domainId)
@@ -29,7 +29,7 @@ def async_save_domain_tech(domainId, techName, localversions):
 
 
 @shared_task
-def async_save_subdomain_techs(subdomainId, techName, localVersions):
+def async_create_subdomain_techs(subdomainId, techName, localVersions):
     print("Save Subdomain Tech : " + techName)
     subdomainModel = apps.get_model(app_label="core", model_name="Subdomain")
     thisSubdomain = subdomainModel.objects.get(pk=subdomainId)
@@ -45,7 +45,7 @@ def saveSubdomains(thisDomain):
         for subdomain in subdomainsResponse["FDNS_A"]:
             subdomainName = subdomain.split(",")[1]
             time.sleep(3)
-            async_save_subdomains.delay(thisDomain.id, subdomainName)
+            async_create_subdomains.delay(thisDomain.id, subdomainName)
             print("Subdomains saved for : " + thisDomain.name)
     except:
         print("Subdomains Not Found")
@@ -58,7 +58,7 @@ def saveTechs(thisDomain):
             techName = tech["name"]
             versions = tech["versions"]
             time.sleep(3)
-            async_save_domain_tech.delay(thisDomain.id, techName, versions)
+            async_create_domain_tech.delay(thisDomain.id, techName, versions)
             print("Saved Domain Techs : " + thisDomain.name)
 
     except:
@@ -98,14 +98,14 @@ def async_get_subdomain_techs(subdomainId):
             techName = tech["name"]
             versions = tech["versions"]
             time.sleep(3)
-            async_save_subdomain_techs.delay(subdomainId, techName, versions)
+            async_create_subdomain_techs.delay(subdomainId, techName, versions)
 
     except:
         print("Some Error Occurred in getting Tech")
 
 
 @shared_task
-def async_get_tech_cve(techId):
+def async_refresh_tech_cve(techId):
     print(techId)
     TechModel = apps.get_model(app_label="core", model_name="Tech")
     thisTech = TechModel.objects.get(pk=techId)
@@ -119,7 +119,45 @@ def async_update_domain_cve(*args):
     thisDomain = domainModel.objects.get(pk=domainId)
     print("Updating CVEs for : " + thisDomain.name)
     for tech in thisDomain.techs.all():
-        async_get_tech_cve.delay(tech.id)
+        async_refresh_tech_cve.delay(tech.id)
     for subdomain in thisDomain.subdomains.all():
         for tech in subdomain.tehs.all():
-            async_get_tech_cve.delay(tech.id)
+            async_refresh_tech_cve.delay(tech.id)
+
+
+@shared_task
+def async_get_tech_cves(techId):
+    techModel = apps.get_model(app_label="core", model_name="Tech")
+    thisTech = techModel.objects.get(pk=techId)
+    oldCVEs = []
+    for old_cve in thisTech.cves.all():
+        oldCVEs.append({"cve_id": old_cve.cve_id})
+        old_cve.delete()
+
+    versions = thisTech.versions["arr"]
+    version = ""
+    if not versions:
+        version = ""
+    else:
+        version = versions[0]
+
+    response = getCVEs(thisTech.name, version)
+
+    for eachCVE in response:
+        isThisNew = True
+        for old in oldCVEs:
+            if old["cve_id"] == eachCVE["cve_id"]:
+                isThisNew = False
+                break
+        arr = {"arr": eachCVE["references"]}
+        cve = None
+        cve = thisTech.cves.create(
+            description=eachCVE["description"],
+            severity=eachCVE["severity"],
+            score=eachCVE["score"],
+            cve_id=eachCVE["cve_id"],
+            references=arr,
+            isNew=isThisNew,
+            tech_id=thisTech.id,
+        )
+        thisTech.cves.add(cve)

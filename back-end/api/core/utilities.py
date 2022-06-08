@@ -15,9 +15,13 @@ def extractDataFromCVE(response):
         references = cve["references"]["reference_data"]
         for reference in references:
             ref_urls.append(reference["url"])
+
         description = cve["description"]["description_data"][0]["value"]
+        cve_id = cve["CVE_data_meta"]["ID"]
+
         score = None
         severity = None
+
         try:
             score = item["impact"]["baseMetricV3"]["cvssV3"]["baseScore"]
             severity = item["impact"]["baseMetricV3"]["cvssV3"]["baseSeverity"]
@@ -31,6 +35,7 @@ def extractDataFromCVE(response):
                 "description": description,
                 "severity": severity,
                 "score": score,
+                "cve_id": cve_id,
             }
         )
     return cves_array
@@ -53,14 +58,14 @@ def getCVEs(technology, version):
         + cpeString1
         + "&apiKey="
         + apiKey
-        + "&resultsPerPage=200"
+        + "&resultsPerPage=300"
     )
     endpoint2 = (
         "https://services.nvd.nist.gov/rest/json/cves/1.0/?cpeMatchString="
         + cpeString2
         + "&apiKey="
         + apiKey
-        + "&resultsPerPage=200"
+        + "&resultsPerPage=300"
     )
 
     response = requests.get(endpoint1)

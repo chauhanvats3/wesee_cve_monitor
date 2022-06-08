@@ -30,3 +30,18 @@ def cascadeDeleteSubdomain(sender, instance, **kwargs):
 def cascadeDeleteTech(sender, instance, **kwargs):
     for cve in instance.cves.all():
         cve.delete()
+
+
+""" @receiver(pre_save, sender=Tech)
+def do_something_if_changed(sender, instance, **kwargs):
+    try:
+        oldTech = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        pass  # Object is new, so field hasn't technically changed, but you may want to do something else here.
+    else:
+        if not oldTech.versions == instance.versions:  # Field has changed
+            for old_cve in instance.cves.all():
+                old_cve.delete()
+        else:  # field has not changed
+            print(oldTech.id)
+ """
