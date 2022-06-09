@@ -15,7 +15,7 @@ from .serializers import (
 )
 from .utilities import findSubdomains, getTechs, verifyDomain
 from .models import Domain, Subdomain, Tech, CVE
-from .tasks import async_get_subdomain_techs
+from .tasks import async_get_subdomain_techs, async_mark_cve_seen
 
 
 class DomainViewSet(viewsets.ModelViewSet):
@@ -73,6 +73,11 @@ class TechViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = TechSerializer
     queryset = Tech.objects.all()
+
+    @action(detail=True, methods=["post"])
+    def markCVEsSeen(self, request, pk):
+        async_mark_cve_seen.delay(pk)
+        return Response("Marking CVEs as Seen")
 
 
 class CVEViewSet(viewsets.ModelViewSet):

@@ -160,10 +160,14 @@ export default {
     },
     closeModal() {
       console.log(this.techToOpen)
+      /*  let cvesSeen = []
       for (let i = 0; i < this.techToOpen.cves.length; i++) {
         let cve = this.techToOpen.cves[i]
-        this.toggleCVESeenBackend(cve)
-      }
+        cvesSeen.push({
+          id: cve.id,
+        })
+      } */
+      this.toggleCVESeenBackend(this.techToOpen.id)
       this.$refs.techModalWrapper.classList.remove('show')
     },
     checkBoxClick() {
@@ -237,6 +241,7 @@ export default {
     left: 100%
     transform: scale(0)
     transition: all 0.4s ease-in-out
+    z-index: 5
 
     &.show
       opacity: 1

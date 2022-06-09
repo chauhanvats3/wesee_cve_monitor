@@ -96,6 +96,10 @@ export const mutations = {
       }
     }
   },
+  cveSeenToggle(state, techId) {
+    /* let tech = getTech(techId)
+    print(tech) */
+  },
 }
 
 export const actions = {
@@ -208,18 +212,15 @@ export const actions = {
 
     context.commit('enumToggle', info.name)
   },
-  async toggleCVESeen(context, info) {
+  async toggleCVESeen(context, techId) {
     try {
-      await this.$axios.$patch(`/cves/${info.id}/`, {
-        isSeen: true,
-        isNew: false,
-      })
+      await this.$axios.$post(`/techs/${techId}/markCVEsSeen/`)
     } catch (e) {
       console.log('Error Occurred')
       console.log(e)
     }
 
-    //context.commit('cveSeenToggle',info.id)
+    context.commit('cveSeenToggle', techId)
   },
   async changeCronInterval(context, info) {
     try {

@@ -1,6 +1,4 @@
-from ensurepip import version
 import random
-import this
 import time
 from celery import shared_task
 from .utilities import getPhoto, getTechs, getCVEs, findSubdomains
@@ -161,3 +159,14 @@ def async_get_tech_cves(techId):
             tech_id=thisTech.id,
         )
         thisTech.cves.add(cve)
+
+
+@shared_task
+def async_mark_cve_seen(techId):
+    print("Marking...")
+    techModel = apps.get_model(app_label="core", model_name="Tech")
+    thisTech = techModel.objects.get(pk=techId)
+    for old_cve in thisTech.cves.all():
+        old_cve.isSeen = True
+        old_cve.isNew = False
+        old_cve.save()

@@ -13,8 +13,11 @@ def extractDataFromCVE(response):
         ref_urls = []
         cve = item["cve"]
         references = cve["references"]["reference_data"]
+        count = 0
         for reference in references:
-            ref_urls.append(reference["url"])
+            if count < 5:
+                ref_urls.append(reference["url"])
+                count = count + 1
 
         description = cve["description"]["description_data"][0]["value"]
         cve_id = cve["CVE_data_meta"]["ID"]
