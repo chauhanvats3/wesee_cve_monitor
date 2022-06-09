@@ -3,6 +3,7 @@ from django.db.models.signals import pre_save, post_save, pre_delete
 from django.dispatch import receiver
 from .utilities import getCVEs
 from django_celery_beat.models import PeriodicTask
+from .periodic import periodic_update_domain_CVEs
 
 
 from .models import Domain, Subdomain, Tech, CVE
@@ -32,16 +33,20 @@ def cascadeDeleteTech(sender, instance, **kwargs):
         cve.delete()
 
 
-""" @receiver(pre_save, sender=Tech)
-def do_something_if_changed(sender, instance, **kwargs):
+@receiver(pre_save, sender=Domain)
+def changeCronJob(sender, instance, **kwargs):
     try:
-        oldTech = sender.objects.get(pk=instance.pk)
+        oldDomain = sender.objects.get(pk=instance.pk)
     except sender.DoesNotExist:
         pass  # Object is new, so field hasn't technically changed, but you may want to do something else here.
     else:
-        if not oldTech.versions == instance.versions:  # Field has changed
-            for old_cve in instance.cves.all():
-                old_cve.delete()
+        if not oldDomain.cron_interval == instance.cron_interval:  # Field has changed
+            print("Changing Cron Job")
+            taskQuery = "Updating " + str(instance.id) + " CVEs"
+            periodicTasks = PeriodicTask.objects.filter(name=taskQuery)
+            for task in periodicTasks:
+                task.delete()
+            periodic_update_domain_CVEs(instance.id, instance.cron_interval)
+
         else:  # field has not changed
-            print(oldTech.id)
- """
+            print("No Need To Change Cron job")

@@ -50,38 +50,6 @@ class Tech(models.Model):
     def save(self, *args, **kwargs):
         super(Tech, self).save(*args, **kwargs)
         async_get_tech_cves.delay(self.id)
-        """ oldCVEs = []
-        for old_cve in self.cves.all():
-            oldCVEs.append({"cve_id": old_cve.cve_id})
-            old_cve.delete()
-
-        versions = self.versions["arr"]
-        version = ""
-        if not versions:
-            version = ""
-        else:
-            version = versions[0]
-
-        response = getCVEs(self.name, version)
-
-        for eachCVE in response:
-            isThisNew = True
-            for old in oldCVEs:
-                if old["cve_id"] == eachCVE["cve_id"]:
-                    isThisNew = False
-                    break
-            arr = {"arr": eachCVE["references"]}
-            cve = None
-            cve = self.cves.create(
-                description=eachCVE["description"],
-                severity=eachCVE["severity"],
-                score=eachCVE["score"],
-                cve_id=eachCVE["cve_id"],
-                references=arr,
-                isNew=isThisNew,
-                tech_id=self.id,
-            )
-            self.cves.add(cve) """
 
 
 class Subdomain(models.Model):
@@ -108,6 +76,7 @@ class Domain(models.Model):
     photo = models.CharField(max_length=550, blank=True)
     author = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
     saved_already = models.BooleanField(default=False)
+    cron_interval = models.PositiveSmallIntegerField(default=2)
 
     @property
     def name(self):

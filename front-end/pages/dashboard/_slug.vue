@@ -3,9 +3,27 @@
     <Nav />
     <p v-if="$fetchState.pending">Fetching Domains...</p>
     <div v-else>
-      <h1 ref="h1">
-        {{ thisDomain.name }}
-      </h1>
+      <div class="top-row">
+        <h1 ref="h1">
+          {{ thisDomain.name }}
+        </h1>
+        <div class="cron">
+          <p>update CVEs every</p>
+          <select
+            name="cron-interval"
+            id="cron-interval"
+            v-model="cronInterval"
+          >
+            <option value="2">two</option>
+            <option value="4">four</option>
+            <option value="6">six</option>
+            <option value="8">eight</option>
+            <option value="10">ten</option>
+            <option value="12">twelve</option>
+          </select>
+          <p>hours</p>
+        </div>
+      </div>
 
       <div class="techs">
         <TechPill
@@ -112,6 +130,14 @@ export default {
         this.toggleEnumerateBackend(this.domainInfo(this.slug))
       },
     },
+    cronInterval: {
+      get() {
+        return this.thisDomain.cron_interval
+      },
+      set(newValue) {
+        this.changeCron({ id: this.thisDomain.id, cronInterval: newValue })
+      },
+    },
   },
   methods: {
     ...mapActions({
@@ -119,6 +145,7 @@ export default {
       getDomainsFromBackend: 'domains/getDomainsFromBackend',
       toggleEnumerateBackend: 'domains/toggleEnumeration',
       toggleCVESeenBackend: 'domains/toggleCVESeen',
+      changeCron: 'domains/changeCronInterval',
     }),
     ...mapMutations({
       enumToggle: 'domains/enumToggle',
@@ -167,6 +194,30 @@ export default {
   position: relative
   padding: 0 3.5%
   padding-top: 120px
+
+  .top-row
+    @include flexify-row
+    justify-content: space-between
+
+    .cron
+      @include flexify-row
+      font-size: 0.75rem
+      p
+        margin: 5px 5px
+      select
+        background: white
+        color: $main-color
+        outline: none
+        text-align: center
+        border: none
+        resize: none
+        outline: none
+        cursor: pointer
+        -webkit-appearance: none
+        -moz-appearance: none
+        appearance: none
+        text-indent: 1px
+        text-overflow: ''
 
   .techs
     @include flexify-row

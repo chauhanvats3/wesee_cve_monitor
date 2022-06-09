@@ -221,6 +221,16 @@ export const actions = {
 
     //context.commit('cveSeenToggle',info.id)
   },
+  async changeCronInterval(context, info) {
+    try {
+      await this.$axios.$patch(`/domains/${info.id}/`, {
+        cron_interval: parseInt(info.cronInterval),
+      })
+    } catch (e) {
+      console.log('Error Occurred')
+      console.log(e)
+    }
+  },
 }
 
 export const getters = {

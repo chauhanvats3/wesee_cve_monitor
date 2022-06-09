@@ -5,7 +5,7 @@ import time
 from celery import shared_task
 from .utilities import getPhoto, getTechs, getCVEs, findSubdomains
 from django.apps import apps
-from .periodic import update_domain_two_hours
+from .periodic import periodic_update_domain_CVEs
 
 
 @shared_task
@@ -79,10 +79,11 @@ def async_get_domain_data(domainId):
         thisDomain.saved_already = True
         thisDomain.save(update_fields=["saved_already"])
 
-        update_domain_two_hours(domainId)
+        periodic_update_domain_CVEs(domainId, thisDomain.cron_interval)
 
         print("Data Set Async completed")
-    print("Data Already Set")
+    else:
+        print("Domain Data Already Set")
 
 
 @shared_task
