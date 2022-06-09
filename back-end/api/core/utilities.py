@@ -61,14 +61,14 @@ def getCVEs(technology, version):
         + cpeString1
         + "&apiKey="
         + apiKey
-        + "&resultsPerPage=300"
+        + "&resultsPerPage=22"
     )
     endpoint2 = (
         "https://services.nvd.nist.gov/rest/json/cves/1.0/?cpeMatchString="
         + cpeString2
         + "&apiKey="
         + apiKey
-        + "&resultsPerPage=300"
+        + "&resultsPerPage=22"
     )
 
     response = requests.get(endpoint1)
