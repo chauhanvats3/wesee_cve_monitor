@@ -20,6 +20,7 @@
           {{ source.severity }}
         </div>
       </div>
+      <div class="isNew" v-if="source.isNew"><p>New</p></div>
       <div class="references" @click.stop="openReferences">
         <p>Open {{ source.references.arr.length }} References</p>
       </div>
@@ -97,7 +98,7 @@ export default {
                 align-self: flex-start
 
 
-        .references
+        .references,.isNew
             margin-top: -35px
             cursor: pointer
             font-size: 0.75rem
@@ -105,6 +106,15 @@ export default {
             height: 100%
             margin-right: 20px
             color: $main-color
+
+        .isNew
+          background: $main-color
+          color: white
+          padding: 7px 15px 7px 20px
+          border-radius: 5px
+          margin-top: -20px
+          letter-spacing: 0.1rem
+
     .description
         margin: 30px auto
         padding: 10px 20px

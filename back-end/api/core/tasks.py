@@ -131,7 +131,7 @@ def async_get_tech_cves(techId):
     thisTech = techModel.objects.get(pk=techId)
     oldCVEs = []
     for old_cve in thisTech.cves.all():
-        oldCVEs.append({"cve_id": old_cve.cve_id})
+        oldCVEs.append({"cve_id": old_cve.cve_id, "isSeen": old_cve.isSeen})
         old_cve.delete()
 
     versions = thisTech.versions["arr"]
@@ -146,9 +146,8 @@ def async_get_tech_cves(techId):
     for eachCVE in response:
         isThisNew = True
         for old in oldCVEs:
-            if old["cve_id"] == eachCVE["cve_id"]:
+            if old["cve_id"] == eachCVE["cve_id"] and old["isSeen"] == True:
                 isThisNew = False
-                break
         arr = {"arr": eachCVE["references"]}
         cve = None
         cve = thisTech.cves.create(

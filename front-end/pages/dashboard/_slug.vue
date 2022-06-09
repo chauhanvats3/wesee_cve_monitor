@@ -118,6 +118,7 @@ export default {
       subdomainToBackend: 'domains/addSubdomainToBackend',
       getDomainsFromBackend: 'domains/getDomainsFromBackend',
       toggleEnumerateBackend: 'domains/toggleEnumeration',
+      toggleCVESeenBackend: 'domains/toggleCVESeen',
     }),
     ...mapMutations({
       enumToggle: 'domains/enumToggle',
@@ -131,10 +132,14 @@ export default {
       this.$refs.techModalWrapper.classList.add('show')
     },
     closeModal() {
+      console.log(this.techToOpen)
+      for (let i = 0; i < this.techToOpen.cves.length; i++) {
+        let cve = this.techToOpen.cves[i]
+        this.toggleCVESeenBackend(cve)
+      }
       this.$refs.techModalWrapper.classList.remove('show')
     },
     checkBoxClick() {
-      //this.enumToggle(this.slug)
       this.toggleEnumerateBackend(this.domainInfo(this.slug))
     },
     addSubdomain() {

@@ -9,6 +9,12 @@
     <p :style="{ background: bgColors[0], color: bgColors[2] }">
       {{ tech.cves.length }}
     </p>
+
+    <p
+      v-if="hasNew"
+      class="newIndicator"
+      :style="{ background: bgColors[2], color: bgColors[0] }"
+    ></p>
   </div>
 </template>
 
@@ -34,6 +40,13 @@ export default {
       if (versions.length > 1) return versions[0]
       return versions[0] == '' ? 'NA' : versions[0]
     },
+    hasNew() {
+      let cves = this.tech.cves
+      for (let i = 0; i < cves.length; i++) {
+        if (cves[i].isNew) return true
+      }
+      return false
+    },
   },
 }
 </script>
@@ -41,8 +54,10 @@ export default {
 <style lang="sass" scoped>
 .tech-pill
     @include flexify-row
-    margin: 0 10px
+    margin: 0 20px
     cursor: pointer
+    position: relative
+
 
     p
         margin: 20px 0px
@@ -55,4 +70,12 @@ export default {
         margin-right: -20px
     p:nth-child(3)
         padding-right: 20px
+
+    .newIndicator
+      position: absolute
+      padding: 10px
+      margin: 0
+      right: -5px
+      top: 15px
+      font-size: 18px
 </style>

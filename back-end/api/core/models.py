@@ -4,7 +4,7 @@ from urllib import request
 from django.db import models
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.backends import TokenBackend
-from .utilities import getPhoto, getTechs, getCVEs, findSubdomains
+from .utilities import getPhoto
 from .tasks import async_get_domain_data, async_get_subdomain_techs, async_get_tech_cves
 
 
@@ -22,6 +22,7 @@ class CVE(models.Model):
     tech_id = models.CharField(max_length=5)
     cve_id = models.CharField(max_length=50, default="")
     isNew = models.BooleanField(default=True)
+    isSeen = models.BooleanField(default=False)
 
     def __str__(self):
         return self.cve_id
@@ -29,6 +30,9 @@ class CVE(models.Model):
     def save(self, *args, **kwargs):
         super(CVE, self).save(*args, **kwargs)
         self.techno.add(self.tech_id)
+
+    class Meta:
+        ordering = ("-isNew",)
 
 
 class Tech(models.Model):

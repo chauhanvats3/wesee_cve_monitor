@@ -208,6 +208,19 @@ export const actions = {
 
     context.commit('enumToggle', info.name)
   },
+  async toggleCVESeen(context, info) {
+    try {
+      await this.$axios.$patch(`/cves/${info.id}/`, {
+        isSeen: true,
+        isNew: false,
+      })
+    } catch (e) {
+      console.log('Error Occurred')
+      console.log(e)
+    }
+
+    //context.commit('cveSeenToggle',info.id)
+  },
 }
 
 export const getters = {
