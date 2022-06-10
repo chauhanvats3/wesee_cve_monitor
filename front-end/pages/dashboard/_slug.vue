@@ -159,14 +159,6 @@ export default {
       this.$refs.techModalWrapper.classList.add('show')
     },
     closeModal() {
-      console.log(this.techToOpen)
-      /*  let cvesSeen = []
-      for (let i = 0; i < this.techToOpen.cves.length; i++) {
-        let cve = this.techToOpen.cves[i]
-        cvesSeen.push({
-          id: cve.id,
-        })
-      } */
       this.toggleCVESeenBackend(this.techToOpen.id)
       this.$refs.techModalWrapper.classList.remove('show')
     },

@@ -25,7 +25,7 @@
       <div class="content" v-if="domainInfo.verified == true">
         <p>Number Of Subdomains : {{ domainInfo.subdomains.length }}</p>
         <p>No Of Techs Found : {{ domainInfo.techs.length }}</p>
-        <p>No Of CVEs Discovered: 555</p>
+        <p>No Of CVEs Discovered: {{ totalCVE }}</p>
       </div>
 
       <div class="cta" v-if="domainInfo.verified == true" ref="cta">
@@ -86,6 +86,20 @@ export default {
       if (this.domainInfo.photo != undefined) {
         return this.domainInfo.photo
       } else return 'https://random.imagecdn.app/550/350'
+    },
+    totalCVE() {
+      let total = 0
+      let domainTechs = this.domainInfo.techs
+      for (let i = 0; i < domainTechs.length; i++) {
+        total += domainTechs[i].cves.length
+      }
+      let subdomains = this.domainInfo.subdomains
+      for (let i = 0; i < subdomains.length; i++) {
+        for (let j = 0; j < subdomains[i].techs.length; j++) {
+          total += subdomains[i].techs[j].cves.length
+        }
+      }
+      return total
     },
   },
   methods: {

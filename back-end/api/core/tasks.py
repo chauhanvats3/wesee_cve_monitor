@@ -51,6 +51,7 @@ def saveSubdomains(thisDomain):
 
 def saveTechs(thisDomain):
     techResponse = getTechs(thisDomain.full_name)
+    print(techResponse)
     try:
         for tech in techResponse[0]["technologies"]:
             techName = tech["name"]

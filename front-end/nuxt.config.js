@@ -91,6 +91,12 @@ export default {
     ],
     sass: ['~assets/sass/mixins.sass', '~assets/sass/variables.sass'],
   },
+  loading: {
+    color: '#00A7C2',
+    height: '3px',
+    failedColor: '#C80000',
+    throttle: 500,
+  },
   /*  server: {
     port: 3000,
     host: '104.248.175.4'
