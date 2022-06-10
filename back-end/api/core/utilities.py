@@ -1,5 +1,5 @@
 import requests
-import time
+import dns.resolver
 
 
 def extractDataFromCVE(response):
@@ -107,7 +107,7 @@ def getTechs(url):
 def verifyDomain(domainName, verifyCode):
     verificationText = "we-see-verification." + domainName + "=" + str(verifyCode)
     try:
-        answers = dns.resolver.resolve(domainName, "txt")
+        answers = dns.resolver.resolve(domainName, "TXT")
     except:
         return "Some Error Occurred"
     for rdata in answers:

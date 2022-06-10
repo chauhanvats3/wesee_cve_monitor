@@ -145,6 +145,7 @@ export default {
     },
     async verifyDomain() {
       let status = await this.verifyThisDomain(this.domainInfo)
+      console.log(status)
       if (status.status == 400) {
         this.$refs.verifyCode.classList.add('not-verified')
         this.$refs.verifyCode.children[0].innerText = status.error

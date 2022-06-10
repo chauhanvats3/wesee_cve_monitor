@@ -1,23 +1,44 @@
 <template>
-  <div class="login-box">
-    <input
-      type="text"
-      class="txtbox"
-      id="user"
-      placeholder="username"
-      v-model.trim="username"
-    />
+  <div style="display: flex; flex-flow: column nowrap; align-items: center">
+    <div class="login-box">
+      <input
+        type="text"
+        class="txtbox"
+        id="user"
+        placeholder="username"
+        v-model.trim="username"
+      />
 
-    <input
-      type="password"
-      class="txtbox"
-      id="pass"
-      placeholder="password"
-      v-model.trim="password"
-      @keypress.enter="login"
-    />
-    <button class="button" @click="login">Login</button>
-    <p v-if="incorrectAuth">Wrong Credentials</p>
+      <div class="pass-row">
+        <input
+          type="password"
+          class="txtbox"
+          id="pass"
+          placeholder="password"
+          v-model.trim="password"
+          @keypress.enter="login"
+        />
+        <button class="button" @click="login">
+          <svg
+            clip-rule="evenodd"
+            fill-rule="evenodd"
+            stroke-linejoin="round"
+            stroke-miterlimit="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            width="70px"
+            height="70px"
+          >
+            <path
+              d="m10.211 7.155c-.141-.108-.3-.157-.456-.157-.389 0-.755.306-.755.749v8.501c0 .445.367.75.755.75.157 0 .316-.05.457-.159 1.554-1.203 4.199-3.252 5.498-4.258.184-.142.29-.36.29-.592 0-.23-.107-.449-.291-.591-1.299-1.002-3.945-3.044-5.498-4.243z"
+              fill="white"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div v-if="incorrectAuth" class="error"><p>Wrong Credentials</p></div>
   </div>
 </template>
 
@@ -55,6 +76,19 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.error
+  @include flexify
+  position: absolute
+  z-index: -1
+  background: $red
+  color: white
+  font-size: 0.8rem
+  width: calc(100% - 40px)
+  padding: 40px 20px 20px 20px
+  bottom: -40px
+  border-radius: 10px
+  transition: all 0.3s ease
+
 .login-box
     @include flexify-col
     margin: 20px
@@ -62,7 +96,12 @@ export default {
     background: rgba(216, 216, 216, 0.5)
     backdrop-filter: blur(10px)
     border-radius: 15px
+    position: relative
+    z-index: 1
 
+    .pass-row
+      @include flexify-row
+      position: relative
     .txtbox
         margin: 10px 0px
         border: none
@@ -70,21 +109,21 @@ export default {
         font-size: 1.2rem
         padding: 15px
         width: 100%
+        position: relative
 
     .button
-        border-radius: 5px
+        @include flexify
+        border-radius: 10px
         border: none
-        background: #00A7A7D9
-        padding: 10px 30px
-        margin-top: 20px
+        background: #00A7A7
         cursor: pointer
         color: white
-        width: max-content
-
-    p
-        color: $red
-        font-size: 0.5rem
-        margin: 20px
+        position: absolute
+        right: 0
+        top: 0
+        width: 80px
+        margin: 10px 0px
+        height: calc(100% - 20px)
 
     @media screen and (min-width: $medium) and (max-width: $large)
         .txtbox

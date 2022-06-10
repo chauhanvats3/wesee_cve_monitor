@@ -13,7 +13,7 @@ from .serializers import (
     TechSerializer,
     CVESerializer,
 )
-from .utilities import findSubdomains, getTechs, verifyDomain
+from .utilities import verifyDomain
 from .models import Domain, Subdomain, Tech, CVE
 from .tasks import (
     async_get_subdomain_techs,
@@ -37,6 +37,7 @@ class DomainViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def verify(self, request, pk):
+        print("Verify initiated")
         thisDomain = self.get_object()
         thisObject = serializers.serialize(
             "json",
@@ -49,7 +50,7 @@ class DomainViewSet(viewsets.ModelViewSet):
         verificationNumber = struct["fields"]["verify_code"]
         name = fullName.split("://")[1]
         isVerified = verifyDomain(name, verificationNumber)
-        if isVerified:
+        if isVerified == True:
             data_to_change = {"verified": "true"}
         else:
             return Response({"status": 400, "error": "Could Not Verify"})
