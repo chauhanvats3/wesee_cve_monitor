@@ -168,11 +168,12 @@ export default {
     addSubdomain() {
       let name = this.newSubdomainName.split('://').pop()
       if (name.search(this.slug) == -1) name = name + '.' + this.slug
-
+      let domainId = this.thisDomain.id
       this.subdomainToBackend({
         domainName: this.slug,
         subdomainName: name,
         include: true,
+        domainId,
       })
       this.newSubdomainName = ''
     },

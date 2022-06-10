@@ -54,9 +54,13 @@ export const mutations = {
   },
   addSubdomain(state, info) {
     let domains = state.allDomains
+    console.log(info)
     for (let i = 0; i < domains.length; i++) {
       if (domains[i].id == info.id) {
-        state.allDomains[i].subdomains.push(info.subdomain)
+        state.allDomains[i].subdomains = [
+          info.subdomain,
+          ...state.allDomains[i].subdomains,
+        ]
       }
     }
   },
@@ -74,13 +78,21 @@ export const mutations = {
     }
   },
   updateStateTech(state, tech) {
+    console.log('Updating state tech')
     let domains = state.allDomains
     for (let i = 0; domains.length; i++) {
       let subdomains = domains[i].subdomains
       let domainTechs = domains[i].techs
       for (let j = 0; j < domainTechs.length; j++) {
         if (domainTechs[j].id == tech.id) {
-          domainTechs[j] = tech
+          console.log('Ho gaya')
+          //domainTechs[j] = tech
+          console.log(state.allDomains[i].techs[j])
+          console.log(tech)
+          state.allDomains[i].techs[j] = tech
+          state.allDomains[i].techs.push(1)
+          state.allDomains[i].techs.pop()
+
           return
         }
       }
@@ -89,7 +101,10 @@ export const mutations = {
         let subdomainTechs = subdomains[j].techs
         for (let k = 0; k < subdomainTechs.length; k++) {
           if (subdomainTechs[k].id == tech.id) {
-            subdomainTechs[k] = tech
+            //subdomainTechs[k] = tech
+            state.allDomains[i].subdomains[j].techs[k] = tech
+            state.allDomains[i].subdomains[j].techs.push(1)
+            state.allDomains[i].subdomains[j].techs.pop()
             return
           }
         }
@@ -148,31 +163,19 @@ export const actions = {
     return 200
   },
   async addSubdomainToBackend(context, info) {
-    let domainId = context.getters.getDomainInfo(info.domainName, 'id')
-    let oldSubdomains = context.getters.getDomainInfo(
-      info.domainName,
-      'subdomains'
-    )
-    oldSubdomains = JSON.parse(JSON.stringify(oldSubdomains))
-    let updateData = {
-      subdomains: [
-        ...oldSubdomains,
-        {
-          name: info.subdomainName,
-          include: info.include,
-          techs: [],
-        },
-      ],
+    let newSubdomain = {
+      name: info.subdomainName,
+      include: true,
+      techs: [],
     }
-
     try {
-      let response = await this.$axios.$patch(
-        '/domains/' + domainId + '/',
-        updateData
+      let response = await this.$axios.$post(
+        '/domains/' + info.domainId + '/addNewSubdomain/',
+        newSubdomain
       )
       context.commit('addSubdomain', {
-        id: domainId,
-        subdomain: response.subdomains.pop(),
+        id: info.domainId,
+        subdomain: newSubdomain,
       })
     } catch (error) {
       return error
@@ -188,11 +191,12 @@ export const actions = {
     }
     context.commit('addSubdomainTechs', techRes)
   },
-  async updateTech(context, info) {
+  async updateTechBackend(context, info) {
     let techRes = ''
     try {
       techRes = await this.$axios.$patch(`/techs/${info.id}/`, {
         versions: { arr: [info.newVer] },
+        updating_cve: true,
       })
       context.commit('updateStateTech', techRes)
       return techRes
@@ -291,7 +295,7 @@ export const getters = {
   getAllDomains(state) {
     return state.allDomains
   },
-  getTech: (state) => (techId) => {
+  getTechFromStore: (state) => (techId) => {
     let domains = state.allDomains
     for (let i = 0; domains.length; i++) {
       let subdomains = domains[i].subdomains

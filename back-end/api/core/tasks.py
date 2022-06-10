@@ -22,7 +22,9 @@ def async_create_domain_tech(domainId, techName, localversions):
     thisDomain = domainModel.objects.get(pk=domainId)
     randColor = "%06x" % random.randint(0, 0xFFFFFF)
     arr = {"arr": localversions}
-    thisDomain.techs.create(name=techName, versions=arr, color=randColor)
+    thisDomain.techs.create(
+        name=techName, versions=arr, color=randColor, updating_cve=True
+    )
     print("Domain Tech Created : " + techName)
 
 
@@ -33,7 +35,9 @@ def async_create_subdomain_techs(subdomainId, techName, localVersions):
     thisSubdomain = subdomainModel.objects.get(pk=subdomainId)
     randColor = "%06x" % random.randint(0, 0xFFFFFF)
     arr = {"arr": localVersions}
-    thisSubdomain.techs.create(name=techName, versions=arr, color=randColor)
+    thisSubdomain.techs.create(
+        name=techName, versions=arr, color=randColor, updating_cve=True
+    )
     print("Saved Subdomain Techs : " + thisSubdomain.name)
 
 
@@ -69,11 +73,12 @@ def async_get_domain_data(domainId):
     domainModel = apps.get_model(app_label="core", model_name="Domain")
     thisDomain = domainModel.objects.get(pk=domainId)
     if thisDomain.saved_already == False:
-        print("Getting Subdomains : " + thisDomain.name)
-        saveSubdomains(thisDomain)
 
         print("Getting Domain Techs : " + thisDomain.name)
         saveTechs(thisDomain)
+
+        print("Getting Subdomains : " + thisDomain.name)
+        saveSubdomains(thisDomain)
 
         thisDomain.saved_already = True
         thisDomain.save(update_fields=["saved_already"])
@@ -89,19 +94,25 @@ def async_get_domain_data(domainId):
 def async_get_subdomain_techs(subdomainId):
     SubdomainModel = apps.get_model(app_label="core", model_name="Subdomain")
     thisSubdomain = SubdomainModel.objects.get(pk=subdomainId)
-    for oldTech in thisSubdomain.techs.all():
-        oldTech.delete()
-    print("Getting Subdomain Techs : " + thisSubdomain.name)
-    techResponse = getTechs(thisSubdomain.name)
-    try:
-        for tech in techResponse[0]["technologies"]:
-            techName = tech["name"]
-            versions = tech["versions"]
-            time.sleep(3)
-            async_create_subdomain_techs.delay(subdomainId, techName, versions)
+    if thisSubdomain.techs_fetched == False:
+        for oldTech in thisSubdomain.techs.all():
+            oldTech.delete()
+        print("Getting Subdomain Techs : " + thisSubdomain.name)
+        techResponse = getTechs(thisSubdomain.name)
+        try:
+            for tech in techResponse[0]["technologies"]:
+                techName = tech["name"]
+                versions = tech["versions"]
+                time.sleep(3)
+                async_create_subdomain_techs.delay(subdomainId, techName, versions)
 
-    except:
-        print("Some Error Occurred in getting Tech")
+        except:
+            print("Some Error Occurred in getting Tech")
+        else:
+            thisSubdomain.techs_fetched = True
+            thisSubdomain.save()
+    else:
+        print("Techs already fetched")
 
 
 @shared_task
@@ -130,36 +141,41 @@ def async_get_tech_cves(techId):
     techModel = apps.get_model(app_label="core", model_name="Tech")
     thisTech = techModel.objects.get(pk=techId)
     oldCVEs = []
-    for old_cve in thisTech.cves.all():
-        oldCVEs.append({"cve_id": old_cve.cve_id, "isSeen": old_cve.isSeen})
-        old_cve.delete()
+    if thisTech.updating_cve is True:
+        for old_cve in thisTech.cves.all():
+            oldCVEs.append({"cve_id": old_cve.cve_id, "isSeen": old_cve.isSeen})
+            old_cve.delete()
 
-    versions = thisTech.versions["arr"]
-    version = ""
-    if not versions:
+        versions = thisTech.versions["arr"]
         version = ""
+        if not versions:
+            version = ""
+        else:
+            version = versions[0]
+
+        response = getCVEs(thisTech.name, version)
+
+        for eachCVE in response:
+            isThisNew = True
+            for old in oldCVEs:
+                if old["cve_id"] == eachCVE["cve_id"] and old["isSeen"] == True:
+                    isThisNew = False
+            arr = {"arr": eachCVE["references"]}
+            cve = None
+            cve = thisTech.cves.create(
+                description=eachCVE["description"],
+                severity=eachCVE["severity"],
+                score=eachCVE["score"],
+                cve_id=eachCVE["cve_id"],
+                references=arr,
+                isNew=isThisNew,
+                tech_id=thisTech.id,
+            )
+            thisTech.cves.add(cve)
+        thisTech.updating_cve = False
+        thisTech.save()
     else:
-        version = versions[0]
-
-    response = getCVEs(thisTech.name, version)
-
-    for eachCVE in response:
-        isThisNew = True
-        for old in oldCVEs:
-            if old["cve_id"] == eachCVE["cve_id"] and old["isSeen"] == True:
-                isThisNew = False
-        arr = {"arr": eachCVE["references"]}
-        cve = None
-        cve = thisTech.cves.create(
-            description=eachCVE["description"],
-            severity=eachCVE["severity"],
-            score=eachCVE["score"],
-            cve_id=eachCVE["cve_id"],
-            references=arr,
-            isNew=isThisNew,
-            tech_id=thisTech.id,
-        )
-        thisTech.cves.add(cve)
+        print("Not Updating CVEs")
 
 
 @shared_task
@@ -171,3 +187,10 @@ def async_mark_cve_seen(techId):
         old_cve.isSeen = True
         old_cve.isNew = False
         old_cve.save()
+
+
+@shared_task
+def async_add_new_subdomain(*args):
+    domainId = args[0]
+    subdomainInfo = args[1]
+    async_create_subdomains.delay(domainId, subdomainInfo["name"])

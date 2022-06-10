@@ -21,10 +21,17 @@
             id="newVersion"
             :style="{ background: bgColors[1], color: bgColors[0] }"
             v-model="newTechVer"
+            v-if="!storeTech.updating_cve"
           />
           <p class="edit" @click.stop="okClicked">ok</p>
         </div>
-        <p class="edit" @click.stop="editClicked">edit</p>
+        <p
+          class="edit"
+          @click.stop="editClicked"
+          v-if="!storeTech.updating_cve"
+        >
+          edit
+        </p>
       </div>
 
       <div>
@@ -36,11 +43,14 @@
     <div class="cves">
       <CVE v-for="(cve, index) in tech.cves" :key="index" :source="cve" />
     </div>
+    <div class="updating" v-if="storeTech.updating_cve">
+      <p>Updating CVEs...</p>
+    </div>
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import CVE from './CVE'
 import VirtualList from 'vue-virtual-scroll-list'
 export default {
@@ -56,7 +66,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions({ updateTech: 'domains/updateTech' }),
+    ...mapActions({ updateTech: 'domains/updateTechBackend' }),
     editClicked() {
       this.$refs.newVer.classList.add('show')
       this.newTechVer = this.techVersion
@@ -88,6 +98,7 @@ export default {
     },
   },
   computed: {
+    ...mapGetters({ getTechStore: 'domains/getTechFromStore' }),
     bgColors() {
       if (!this.tech.color) return []
 
@@ -102,10 +113,13 @@ export default {
       return bg
     },
     techVersion() {
-      let versions = this.tech.versions.arr
+      let versions = this.storeTech.versions.arr
       if (versions.length == 0) return 'NA'
       if (versions.length > 1) return versions[0]
       return versions[0] == '' ? 'NA' : versions[0]
+    },
+    storeTech() {
+      return this.getTechStore(this.tech.id)
     },
   },
 }
@@ -152,11 +166,12 @@ export default {
     div:nth-child(1)
           margin-right: -20px
           border-top-left-radius: 10px
-          z-index: 2
+          z-index: 3
     div:nth-child(2)
           margin-right: -20px
-          z-index: 1
+          z-index: 2
     div:nth-child(3)
+          z-index: 1
           border-bottom-right-radius: 0
     .version
       .newVer
@@ -178,4 +193,16 @@ export default {
     width: 100%
     height: 100%
     overflow-y: scroll
+    position: relative
+  .updating
+    @include flexify-col
+    position: absolute
+    width: 100%
+    height: 100%
+    color: white
+    top: 0
+    left: 0
+    background: rgba(72, 72, 72, 0.44)
+    backdrop-filter: blur(9.4px)
+    -webkit-backdrop-filter: blur(9.4px)
 </style>

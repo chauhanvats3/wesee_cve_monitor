@@ -139,6 +139,7 @@ export default {
       }, 500)
     },
     async deleteDomain() {
+      //Add Delete Loader
       if (!this.domainInfo.verified) this.closeVerifyInstructions()
       let status = await this.deleteThisDomain(this.domainInfo.name)
     },

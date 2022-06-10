@@ -1,6 +1,4 @@
-from pickle import TRUE
-import random
-from urllib import request
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.backends import TokenBackend
@@ -43,6 +41,7 @@ class Tech(models.Model):
     versions = models.JSONField(default=json_default)
     cves = models.ManyToManyField(CVE, blank=True, related_name="techno")
     color = models.CharField(max_length=6, default="828192")
+    updating_cve = models.BooleanField(default=True)
 
     def __str__(self):
         return "%s " % (self.name)
@@ -57,6 +56,7 @@ class Subdomain(models.Model):
     include = models.BooleanField(default=True)
     techs = models.ManyToManyField(Tech)
     techs_fetched = models.BooleanField(default=False)
+    created_date = models.DateTimeField("date created", default=timezone.now)
 
     def __str__(self):
         return "%s" % (self.name)
@@ -64,6 +64,9 @@ class Subdomain(models.Model):
     def save(self, *args, **kwargs):
         super(Subdomain, self).save(*args, **kwargs)
         async_get_subdomain_techs.delay(self.id)
+
+    class Meta:
+        ordering = ["-created_date"]
 
 
 class Domain(models.Model):

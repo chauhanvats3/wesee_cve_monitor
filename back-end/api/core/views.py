@@ -1,6 +1,6 @@
-from crypt import methods
-import random
+import datetime
 import json
+from django.db.models import Count
 
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -15,7 +15,11 @@ from .serializers import (
 )
 from .utilities import findSubdomains, getTechs, verifyDomain
 from .models import Domain, Subdomain, Tech, CVE
-from .tasks import async_get_subdomain_techs, async_mark_cve_seen
+from .tasks import (
+    async_get_subdomain_techs,
+    async_mark_cve_seen,
+    async_add_new_subdomain,
+)
 
 
 class DomainViewSet(viewsets.ModelViewSet):
@@ -54,7 +58,13 @@ class DomainViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             self.perform_update(serializer)
 
-        return Response(serializer.data)
+        return Response({"status": 200, "message": "Domain is verified"})
+
+    @action(detail=True, methods=["post"])
+    def addNewSubdomain(self, request, pk):
+        print(request.data)
+        async_add_new_subdomain.delay(pk, request.data)
+        return Response({"status": 200, "message": "Subomain Will Be added for sure"})
 
 
 class SubdomainViewSet(viewsets.ModelViewSet):
@@ -62,9 +72,14 @@ class SubdomainViewSet(viewsets.ModelViewSet):
     serializer_class = SubdomainSerializer
     queryset = Subdomain.objects.all()
 
+    def get_queryset(self):
+        queryset = self.queryset
+        query_set = queryset.annotate(q_count=Count("techs")).order_by("-q_count")
+        return query_set
+
     @action(detail=True, methods=["post"])
     def findTech(self, request, pk):
-        print("Async Tech Update Received")
+        print("Updatind Techs for : " + self.name)
         async_get_subdomain_techs.delay(pk)
         return Response("Updating Subdomain Techs")
 
