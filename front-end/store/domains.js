@@ -64,14 +64,14 @@ export const mutations = {
       }
     }
   },
-  addSubdomainTechs(state, info) {
+  searchingSubdomainTechs(state, id) {
     let domains = state.allDomains
     for (let i = 0; i < domains.length; i++) {
       let subdomains = domains[i].subdomains
       for (let j = 0; j < subdomains.length; j++) {
-        if (subdomains[j].id == info.id) {
-          subdomains[j].techs = info.techs
-          subdomains[j].techSearched = true
+        if (subdomains[j].id == id) {
+          subdomains[j].techs_fetched = false
+          subdomains[j].techs = []
           return
         }
       }
@@ -110,10 +110,6 @@ export const mutations = {
         }
       }
     }
-  },
-  cveSeenToggle(state, techId) {
-    /* let tech = getTech(techId)
-    print(tech) */
   },
 }
 
@@ -185,12 +181,12 @@ export const actions = {
   },
   async getSubdomainTechs(context, id) {
     let techRes = {}
+    context.commit('searchingSubdomainTechs', id)
     try {
       techRes = await this.$axios.$post(`/subdomains/${id}/findTech/`)
     } catch (error) {
-      context.commit('addSubdomainTechs', techRes)
+      console.log('Some Error in getting subdomain techs!')
     }
-    context.commit('addSubdomainTechs', techRes)
   },
   async updateTechBackend(context, info) {
     let techRes = ''
