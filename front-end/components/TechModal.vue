@@ -202,7 +202,12 @@ export default {
     color: white
     top: 0
     left: 0
-    background: rgba(72, 72, 72, 0.44)
+    background: rgb(49 48 48 / 67%)
     backdrop-filter: blur(9.4px)
     -webkit-backdrop-filter: blur(9.4px)
+    p
+          @include text-gradient-animated
+          color: white
+          font-size: 1.3rem
+          text-transform: uppercase
 </style>
