@@ -121,5 +121,10 @@ def findSubdomains(domainName):
     print("Finding Subdomains : " + domainName)
     subdomainApi = "https://dns.bufferover.run/dns?q=." + domainName
     response = requests.get(subdomainApi)
+    errorStr = "[521]"
+    print(response.content)
+    if errorStr in str(response):
+        print("Server is down")
+
     print("Got subdomains for : " + domainName)
     return response.json()

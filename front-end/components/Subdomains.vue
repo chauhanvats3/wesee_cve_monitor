@@ -8,7 +8,7 @@
       <div class="wrapper" v-if="subdomain.include">
         <div class="top-bar">
           <h3>{{ subdomain.name }}</h3>
-          <div class="options">
+          <div class="options" v-if="subdomain.techs_fetched">
             <p class="getTech" @click.stop="getSubdomainTechs(subdomain.id)">
               refresh
             </p>
@@ -26,6 +26,12 @@
               subPillClicked({ subdomain: subdomain.name, tech: tech })
             "
           />
+        </div>
+        <div
+          v-else-if="!subdomain.techs_fetched"
+          class="tech_not_found finding"
+        >
+          Fetching Technologies
         </div>
         <div v-else class="tech_not_found"><p>No Technologies Found</p></div>
       </div>
@@ -94,4 +100,6 @@ export default {
             color: #aaa
             letter-spacing: 0.3rem
             word-spacing: 1rem
+        .finding
+          @include text-gradient-animated
 </style>

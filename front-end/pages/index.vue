@@ -3,9 +3,9 @@
     <Nav />
     <div class="bg"></div>
     <div class="intro">
-      <h1 class="main">Why This Tool Is Useful To You!</h1>
+      <h1 class="main">Scan Holes In Your Security!</h1>
       <p class="sub">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin orci.
+        Help us in helping you to secure your web apllications even further.
       </p>
     </div>
     <div class="graphic">
@@ -29,6 +29,11 @@ export default {
   },
   computed: {
     ...mapGetters(['isAuthenticated', 'loggedInUser']),
+  },
+  watch: {
+    $route() {
+      location.reload()
+    },
   },
 }
 </script>

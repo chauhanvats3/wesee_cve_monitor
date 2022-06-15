@@ -144,11 +144,18 @@ export default {
       let status = await this.deleteThisDomain(this.domainInfo.name)
     },
     async verifyDomain() {
-      let status = await this.verifyThisDomain(this.domainInfo)
-      console.log(status)
-      if (status.status == 400) {
+      let response = await this.verifyThisDomain(this.domainInfo)
+      console.log(response)
+      if (response.status == 200) {
+        this.$refs.verifyCode.classList.add('verified')
+        this.$refs.verifyCode.children[0].innerText =
+          'Succefully Verified! Refresh the page.'
+      } else if (response.status == 400) {
         this.$refs.verifyCode.classList.add('not-verified')
-        this.$refs.verifyCode.children[0].innerText = status.error
+        this.$refs.verifyCode.children[0].innerText = response.error
+      } else {
+        this.$refs.verifyCode.classList.add('not-verified')
+        this.$refs.verifyCode.children[0].innerText = 'Please refresh the page.'
       }
     },
   },
@@ -338,6 +345,11 @@ $top-row-height : 60px
                justify-content: center
                p
                  color: white
+              &.verified
+                background: $main-color
+                justify-content: center
+                p
+                  color: white
 
             .btn
               font-size: 0.8rem

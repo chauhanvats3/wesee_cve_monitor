@@ -167,6 +167,7 @@ export const actions = {
       name: info.subdomainName,
       include: true,
       techs: [],
+      techs_fetched: false,
     }
     try {
       let response = await this.$axios.$post(

@@ -74,14 +74,15 @@ def async_get_domain_data(domainId):
     thisDomain = domainModel.objects.get(pk=domainId)
     if thisDomain.saved_already == False:
 
+        thisDomain.saved_already = True
+        thisDomain.save(update_fields=["saved_already"])
+
+        print("async_getDomain_data")
         print("Getting Domain Techs : " + thisDomain.name)
         saveTechs(thisDomain)
 
         print("Getting Subdomains : " + thisDomain.name)
         saveSubdomains(thisDomain)
-
-        thisDomain.saved_already = True
-        thisDomain.save(update_fields=["saved_already"])
 
         periodic_update_domain_CVEs(domainId, thisDomain.cron_interval)
 
@@ -108,7 +109,8 @@ def async_get_subdomain_techs(subdomainId):
 
         except:
             print("Some Error Occurred in getting Tech")
-        else:
+
+        finally:
             thisSubdomain.techs_fetched = True
             thisSubdomain.save()
     else:

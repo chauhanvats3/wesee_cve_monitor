@@ -1,7 +1,9 @@
 <template>
   <div class="dashboard-slug">
     <Nav />
-    <p v-if="$fetchState.pending">Fetching Domains...</p>
+    <div v-if="$fetchState.pending">
+      <Fetching />
+    </div>
     <div v-else>
       <div class="top-row">
         <h1 ref="h1">

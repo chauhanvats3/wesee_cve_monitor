@@ -1,6 +1,7 @@
-import datetime
 import json
 from django.db.models import Count
+from django.apps import apps
+
 
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -16,7 +17,6 @@ from .serializers import (
 from .utilities import verifyDomain
 from .models import Domain, Subdomain, Tech, CVE
 from .tasks import (
-    async_get_subdomain_techs,
     async_mark_cve_seen,
     async_add_new_subdomain,
 )
@@ -53,7 +53,7 @@ class DomainViewSet(viewsets.ModelViewSet):
         if isVerified == True:
             data_to_change = {"verified": "true"}
         else:
-            return Response({"status": 400, "error": "Could Not Verify"})
+            return Response({"status": 400, "error": "Could Not Verify. Try Later!"})
         # Partial update of the data
         serializer = DomainSerializer(thisDomain, data=data_to_change, partial=True)
         if serializer.is_valid():
@@ -81,7 +81,11 @@ class SubdomainViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def findTech(self, request, pk):
         print("Updatind Techs for : " + self.name)
-        async_get_subdomain_techs.delay(pk)
+        subdomainId = pk
+        SubdomainModel = apps.get_model(app_label="core", model_name="Subdomain")
+        thisSubdomain = SubdomainModel.objects.get(pk=subdomainId)
+        thisSubdomain.techs_fetched = False
+        thisSubdomain.save()
         return Response("Updating Subdomain Techs")
 
 

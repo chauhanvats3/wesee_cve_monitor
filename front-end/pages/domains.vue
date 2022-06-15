@@ -1,7 +1,9 @@
 <template>
   <div class="domains">
     <Nav />
-    <p v-if="$fetchState.pending">Fetching Domains...</p>
+    <div v-if="$fetchState.pending">
+      <Fetching />
+    </div>
     <div v-else>
       <div class="content">
         <DomainCard
@@ -37,8 +39,8 @@ export default {
   },
   async fetch() {
     let storedDomains = this.$store.getters['domains/getAllDomains']
+    console.log(storedDomains)
     if (storedDomains.length == 0) {
-      console.log('Getting from BAckend')
       await this.getDomainsFromBackend()
     }
   },
@@ -49,6 +51,14 @@ export default {
 <style lang="sass" scoped>
 .domains
   margin-top: 100px
+  .fetching
+    @include flexify-row
+    width: 100vw
+    height: 100vh
+    svg
+      width: 50px
+      height: 50px
+      margin: 10px 30px
   .content
     @include flexify-row
     flex-wrap: wrap !important

@@ -1,7 +1,10 @@
 <template>
   <div class="dashboard">
     <Nav />
-    <div class="domains">
+    <div v-if="$fetchState.pending">
+      <Fetching />
+    </div>
+    <div class="domains" v-else>
       <h1>All Domains :</h1>
       <ul>
         <li v-for="(domain, index) in domains" :key="index">
