@@ -97,7 +97,7 @@ def getTechs(url):
     print("Getting Tech For : " + url)
     if url.startswith("https://") == False:
         url = "https://" + url
-    Headers = {"x-api-key": "j0LO9oYxsW9yNslAaNDMS4Tkdk6v4khMaiqb49Ow"}
+    Headers = {"x-api-key": "9ZQ6b0gKqS9jtLsmT02dO7qWUU52pWGna02wGKPT"}
     endpoint = "https://api.wappalyzer.com/v2/lookup/?urls=" + url
     response = requests.get(endpoint, headers=Headers)
     print("Got Tech For : " + url)
