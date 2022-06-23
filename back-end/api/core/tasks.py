@@ -134,7 +134,7 @@ def async_update_domain_cve(*args):
     for tech in thisDomain.techs.all():
         async_refresh_tech_cve.delay(tech.id)
     for subdomain in thisDomain.subdomains.all():
-        for tech in subdomain.tehs.all():
+        for tech in subdomain.techs.all():
             async_refresh_tech_cve.delay(tech.id)
 
 

@@ -112,6 +112,9 @@ def verifyDomain(domainName, verifyCode):
         return "Some Error Occurred"
     for rdata in answers:
         strData = str(rdata).strip('"')
+        print(strData)
+        print(verificationText)
+        print("Verifying...")
         if verificationText == strData:
             return True
     return False
