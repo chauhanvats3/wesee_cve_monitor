@@ -5,40 +5,33 @@
         type="text"
         class="txtbox"
         id="user"
+        name="username"
         placeholder="username"
         v-model.trim="username"
       />
 
-      <div class="pass-row">
-        <input
-          type="password"
-          class="txtbox"
-          id="pass"
-          placeholder="password"
-          v-model.trim="password"
-          @keypress.enter="login"
-        />
-        <button class="button" @click="login">
-          <svg
-            clip-rule="evenodd"
-            fill-rule="evenodd"
-            stroke-linejoin="round"
-            stroke-miterlimit="2"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            width="70px"
-            height="70px"
-          >
-            <path
-              d="m10.211 7.155c-.141-.108-.3-.157-.456-.157-.389 0-.755.306-.755.749v8.501c0 .445.367.75.755.75.157 0 .316-.05.457-.159 1.554-1.203 4.199-3.252 5.498-4.258.184-.142.29-.36.29-.592 0-.23-.107-.449-.291-.591-1.299-1.002-3.945-3.044-5.498-4.243z"
-              fill="white"
-            />
-          </svg>
-        </button>
+      <input
+        type="password"
+        class="txtbox"
+        id="pass"
+        placeholder="password"
+        name="current-password"
+        v-model.trim="password"
+        @keypress.enter="login"
+      />
+      <div class="bottom-row">
+        <NuxtLink to="/register">
+          <p class="btn register">Register?</p>
+        </NuxtLink>
+        <div class="button" @click="login">
+          <p class="btn login">Login</p>
+        </div>
       </div>
     </div>
 
-    <div v-if="incorrectAuth" class="error"><p>Wrong Credentials</p></div>
+    <div class="error" ref="errorToast">
+      <p>{{ this.error }}</p>
+    </div>
   </div>
 </template>
 
@@ -50,8 +43,7 @@ export default {
     return {
       username: '',
       password: '',
-      incorrectAuth: false,
-      error: '',
+      error: 'Some Error',
     }
   },
   methods: {
@@ -67,8 +59,17 @@ export default {
           },
         })
       } catch (e) {
-        this.incorrectAuth = true
         this.error = e
+
+        if (e.toString().indexOf('status code 401') != -1)
+          this.error = 'Username/Password Invalid!'
+
+        this.$refs.errorToast.classList.add('show')
+        setTimeout(() => {
+          this.$refs.errorToast.classList.remove('show')
+        }, 3000)
+
+        console.log(e.toString())
       }
     },
   },
@@ -78,19 +79,23 @@ export default {
 <style lang="sass" scoped>
 .error
   @include flexify
-  position: absolute
-  z-index: -1
+  position: fixed
+  bottom: -100%
   background: $red
   color: white
   font-size: 0.8rem
-  width: calc(100% - 40px)
-  padding: 40px 20px 20px 20px
-  bottom: -40px
+  width: max-content
+  height: max-content
+  padding: 20px 30px
   border-radius: 10px
-  transition: all 0.3s ease
+  transition: all 0.4s ease-in-out
+
+.error.show
+  bottom:10px
 
 .login-box
     @include flexify-col
+    align-items: flex-start
     margin: 20px
     padding: 20px
     background: rgba(216, 216, 216, 0.5)
@@ -99,9 +104,29 @@ export default {
     position: relative
     z-index: 1
 
-    .pass-row
+    .bottom-row
       @include flexify-row
-      position: relative
+      width: 100%
+      justify-content: space-between
+
+      .btn
+          font-size: 0.75rem
+          margin: 10px 0 0 5px
+          padding: 10px 20px
+          color: $black
+          border-radius: 3px
+          background: rgb(255 255 255 / 9%)
+          backdrop-filter: blur(4px)
+          transition: all 0.4s ease
+          &:hover
+            color: $main-color
+
+      .login
+          background: $main-color
+          color: white
+          cursor: pointer
+          &:hover
+            color:$black
     .txtbox
         margin: 10px 0px
         border: none
@@ -111,19 +136,7 @@ export default {
         width: 100%
         position: relative
 
-    .button
-        @include flexify
-        border-radius: 10px
-        border: none
-        background: #00A7A7
-        cursor: pointer
-        color: white
-        position: absolute
-        right: 0
-        top: 0
-        width: 80px
-        margin: 10px 0px
-        height: calc(100% - 20px)
+
 
     @media screen and (min-width: $medium) and (max-width: $large)
         .txtbox

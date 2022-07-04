@@ -117,7 +117,7 @@ export const actions = {
   async getDomainsFromBackend(context) {
     let domains = []
     try {
-      domains = await this.$axios.$get('/domains/')
+      domains = await this.$axios.$get('/api/domains/')
     } catch (error) {
       return 401
     }
@@ -128,7 +128,7 @@ export const actions = {
     let errors = []
     try {
       context.commit('addDomain', domainInfo)
-      let info = await this.$axios.$post('/domains/', domainInfo)
+      let info = await this.$axios.$post('/api/domains/', domainInfo)
       domainInfo = info
       context.commit('updateDomain', domainInfo)
     } catch (error) {
@@ -141,7 +141,7 @@ export const actions = {
   async verifyDomain(context, domainInfo) {
     try {
       let status = await this.$axios.$post(
-        '/domains/' + domainInfo.id + '/verify/'
+        '/api/domains/' + domainInfo.id + '/verify/'
       )
       return status
     } catch (error) {
@@ -151,7 +151,7 @@ export const actions = {
   async deleteDomainFromBackend(context, domainName) {
     let domainId = context.getters.getDomainInfo(domainName, 'id')
     try {
-      await this.$axios.$delete('/domains/' + domainId)
+      await this.$axios.$delete('/api/domains/' + domainId)
       context.commit('removeDomain', domainId)
     } catch (error) {
       return error
@@ -167,7 +167,7 @@ export const actions = {
     }
     try {
       let response = await this.$axios.$post(
-        '/domains/' + info.domainId + '/addNewSubdomain/',
+        '/api/domains/' + info.domainId + '/addNewSubdomain/',
         newSubdomain
       )
       context.commit('addSubdomain', {
@@ -183,7 +183,7 @@ export const actions = {
     let techRes = {}
     context.commit('searchingSubdomainTechs', id)
     try {
-      techRes = await this.$axios.$post(`/subdomains/${id}/findTech/`)
+      techRes = await this.$axios.$post(`/api/subdomains/${id}/findTech/`)
     } catch (error) {
       console.log('Some Error in getting subdomain techs!')
     }
@@ -191,7 +191,7 @@ export const actions = {
   async updateTechBackend(context, info) {
     let techRes = ''
     try {
-      techRes = await this.$axios.$patch(`/techs/${info.id}/`, {
+      techRes = await this.$axios.$patch(`/api/techs/${info.id}/`, {
         versions: { arr: [info.newVer] },
         updating_cve: true,
       })
@@ -203,7 +203,7 @@ export const actions = {
   },
   async toggleEnumeration(context, info) {
     try {
-      await this.$axios.$patch(`/domains/${info.id}/`, {
+      await this.$axios.$patch(`/api/domains/${info.id}/`, {
         enumerate: !info.enumerate,
       })
     } catch (e) {
@@ -215,7 +215,7 @@ export const actions = {
   },
   async toggleCVESeen(context, techId) {
     try {
-      await this.$axios.$post(`/techs/${techId}/markCVEsSeen/`)
+      await this.$axios.$post(`/api/techs/${techId}/markCVEsSeen/`)
     } catch (e) {
       console.log('Error Occurred')
       console.log(e)
@@ -225,7 +225,7 @@ export const actions = {
   },
   async changeCronInterval(context, info) {
     try {
-      await this.$axios.$patch(`/domains/${info.id}/`, {
+      await this.$axios.$patch(`/api/domains/${info.id}/`, {
         cron_interval: parseInt(info.cronInterval),
       })
     } catch (e) {

@@ -1,11 +1,10 @@
 <template>
   <div class="index">
-    <Nav />
     <div class="bg"></div>
     <div class="intro">
       <h1 class="main">Scan Holes In Your Security!</h1>
       <p class="sub">
-        Help us in helping you to secure your web apllications even further.
+        Help us in helping you to secure your web applications even further.
       </p>
     </div>
     <div class="graphic">
@@ -30,11 +29,11 @@ export default {
   computed: {
     ...mapGetters(['isAuthenticated', 'loggedInUser']),
   },
-  watch: {
+  /* watch: {
     $route() {
       location.reload()
     },
-  },
+  }, */
 }
 </script>
 
@@ -70,6 +69,8 @@ export default {
     .sub
       font-size: 1.5rem
       max-width: 70%
+      padding: 30px 0
+      line-height: 2rem
 
   .graphic
     @include flexify

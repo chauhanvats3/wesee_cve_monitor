@@ -5,7 +5,20 @@ export const state = () => ({})
 export const mutations = {}
 
 //actions are async calls to 3rd party
-export const actions = {}
+export const actions = {
+  async registerUserOnBackend(context, userData) {
+    try {
+      await this.$axios.$post('/auth/register/', userData).then((data) => {
+        console.log(data)
+      })
+    } catch (err) {
+      console.log('Error in action')
+      console.log(err.message)
+      throw err
+    }
+    return { status: 201, message: 'Registered Success!' }
+  },
+}
 
 //getters help inside app to get data from vuex store
 export const getters = {

@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard">
-    <Nav />
     <div v-if="$fetchState.pending">
       <Fetching />
     </div>

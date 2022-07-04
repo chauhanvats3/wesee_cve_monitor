@@ -1,8 +1,11 @@
 <template>
   <div class="dashboard-slug">
-    <Nav />
     <div v-if="$fetchState.pending">
       <Fetching />
+    </div>
+    <div v-else-if="thisDomain.name == ''" class="error">
+      <p class="code">404</p>
+      <p class="message">Domain Not Found!</p>
     </div>
     <div v-else>
       <div class="top-row">
@@ -193,6 +196,16 @@ export default {
   position: relative
   padding: 0 3.5%
   padding-top: 120px
+
+  .error
+    @include flexify-col
+    color: $black
+    .code
+      font-size: 15rem
+      text-shadow: 0 0 7px $red
+    .message
+      font-size: 2rem
+      color: $red
 
   .top-row
     @include flexify-row
