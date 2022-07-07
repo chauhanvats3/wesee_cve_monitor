@@ -247,11 +247,12 @@ export default {
         @include flexify-col
         align-items: flex-start
         align-self: center
-        max-width: 65ch
+        max-width: 45ch
         margin: 50px 20px
 
         .wrap
             @include flexify-col
+            flex-wrap:  wrap
             width: 100%
             .email,.name,.password,.bottom-row
                 @include flexify-row
@@ -262,6 +263,7 @@ export default {
                 min-height: 0.7rem
                 padding: 0 20px
                 margin: 0
+                max-width: 100%
                 p
                     font-size: 0.7rem
                     color: $red

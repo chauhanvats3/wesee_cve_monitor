@@ -1,5 +1,11 @@
 import requests
 import dns.resolver
+from bs4 import BeautifulSoup
+from django.core.mail import send_mail
+
+WAPPALYZER_API_KEY = "y6zvx1SEJC5hx7rjnAvYu6jOqDEntYID91PGAlND"
+UNSPLASH_API_KEY = "mjxmWdfEkErf3EYA66iggKKsgywYcrsy5P7ABqJ5-hE"
+NVD_API_KEY = "09287fcf-8c39-4531-a50e-0a5132cb4664"
 
 
 def extractDataFromCVE(response):
@@ -45,12 +51,10 @@ def extractDataFromCVE(response):
 
 
 def getCVEs(technology, version):
-    print("Getting CVEs for : " + technology + " : " + version)
     if not version:
         version = "*"
     technology = technology.replace(" ", "_")
     technology = technology.replace("-", "_")
-    apiKey = "09287fcf-8c39-4531-a50e-0a5132cb4664"
     cpeString1 = "cpe:2.3:a:*:" + technology + ":" + version + ":*:*:*:*:*:*:*"
     cpeString2 = "cpe:2.3:a:" + technology + ":*:" + version + ":*:*:*:*:*:*:*"
 
@@ -60,15 +64,15 @@ def getCVEs(technology, version):
         "https://services.nvd.nist.gov/rest/json/cves/1.0/?cpeMatchString="
         + cpeString1
         + "&apiKey="
-        + apiKey
-        + "&resultsPerPage=22"
+        + NVD_API_KEY
+        + "&resultsPerPage=100"
     )
     endpoint2 = (
         "https://services.nvd.nist.gov/rest/json/cves/1.0/?cpeMatchString="
         + cpeString2
         + "&apiKey="
-        + apiKey
-        + "&resultsPerPage=22"
+        + NVD_API_KEY
+        + "&resultsPerPage=100"
     )
 
     response = requests.get(endpoint1)
@@ -76,28 +80,28 @@ def getCVEs(technology, version):
     if extraction is not None:
         cves = cves + extraction
 
-    response = requests.get(endpoint2)
+    """ response = requests.get(endpoint2)
     extraction = extractDataFromCVE(response)
     if extraction is not None:
-        cves = cves + extraction
+        cves = cves + extraction """
 
-    print("got cves for : " + technology)
+    print("got cves for : " + technology + " : " + version)
 
     return cves
 
 
 def getPhoto():
     response = requests.get(
-        "https://api.unsplash.com/photos/random?orientation=squarish&content_filter=high&client_id=mjxmWdfEkErf3EYA66iggKKsgywYcrsy5P7ABqJ5-hE"
+        "https://api.unsplash.com/photos/random?orientation=squarish&content_filter=high&client_id="
+        + UNSPLASH_API_KEY
     )
     return response.json()["urls"]["regular"]
 
 
 def getTechs(url):
-    print("Getting Tech For : " + url)
     if url.startswith("https://") == False:
         url = "https://" + url
-    Headers = {"x-api-key": "9ZQ6b0gKqS9jtLsmT02dO7qWUU52pWGna02wGKPT"}
+    Headers = {"x-api-key": WAPPALYZER_API_KEY}
     endpoint = "https://api.wappalyzer.com/v2/lookup/?urls=" + url
     response = requests.get(endpoint, headers=Headers)
     print("Got Tech For : " + url)
@@ -112,8 +116,6 @@ def verifyDomain(domainName, verifyCode):
         return "Some Error Occurred"
     for rdata in answers:
         strData = str(rdata).strip('"')
-        print(strData)
-        print(verificationText)
         print("Verifying...")
         if verificationText == strData:
             return True
@@ -121,13 +123,33 @@ def verifyDomain(domainName, verifyCode):
 
 
 def findSubdomains(domainName):
-    print("Finding Subdomains : " + domainName)
-    subdomainApi = "https://dns.bufferover.run/dns?q=." + domainName
-    response = requests.get(subdomainApi)
-    errorStr = "[521]"
-    print(response.content)
-    if errorStr in str(response):
-        print("Server is down")
+    crtApi = "https://crt.sh/?Identity=" + domainName + "&exclude=expired&deduplicate=Y"
+    response_html = requests.get(crtApi)
+    soup = BeautifulSoup(response_html.content, features="html.parser")
 
-    print("Got subdomains for : " + domainName)
-    return response.json()
+    for e in soup.findAll("br"):
+        e.extract()
+
+    innerTable = soup.select("body > table")[1]
+    tdArr = innerTable.select("tr > td:nth-child(6)")
+
+    resArr = []
+
+    for child in tdArr:
+        for txt in child.contents:
+            txt = txt.replace("www.", "")
+            if txt not in resArr and txt != domainName:
+                resArr.append(txt)
+
+    return resArr
+
+
+def sendCVEmail(data):
+    print("sending mail...")
+    subject = data["subject"]
+    html_message = data["body"]
+    plain_message = html_message.replace("<br/>", "\n")
+    from_email = "news@weseecves.com"
+    to = data["recepient"]
+
+    send_mail(subject, plain_message, from_email, [to], html_message=html_message)

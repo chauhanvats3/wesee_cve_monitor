@@ -1,12 +1,10 @@
+from enum import unique
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.backends import TokenBackend
+from celery import group
 from .utilities import getPhoto
 from .tasks import async_get_domain_data, async_get_subdomain_techs, async_get_tech_cves
-
-
-from .utilities import getCVEs
 
 
 class CVE(models.Model):
@@ -17,7 +15,7 @@ class CVE(models.Model):
     severity = models.CharField(max_length=20)
     score = models.CharField(max_length=5)
     references = models.JSONField(default=json_default)
-    tech_id = models.CharField(max_length=5)
+    tech_id = models.CharField(max_length=10)
     cve_id = models.CharField(max_length=50, default="")
     isNew = models.BooleanField(default=True)
     isSeen = models.BooleanField(default=False)
@@ -31,6 +29,10 @@ class CVE(models.Model):
 
     class Meta:
         ordering = ("-isNew",)
+        unique_together = (
+            "cve_id",
+            "tech_id",
+        )
 
 
 class Tech(models.Model):
@@ -42,13 +44,14 @@ class Tech(models.Model):
     cves = models.ManyToManyField(CVE, blank=True, related_name="techno")
     color = models.CharField(max_length=6, default="828192")
     updating_cve = models.BooleanField(default=True)
+    author = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return "%s " % (self.name)
 
     def save(self, *args, **kwargs):
         super(Tech, self).save(*args, **kwargs)
-        async_get_tech_cves.delay(self.id)
+        async_get_tech_cves.delay(self.id, False)
 
 
 class Subdomain(models.Model):

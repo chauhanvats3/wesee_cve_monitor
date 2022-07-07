@@ -159,3 +159,13 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
+
+
+# mailtrap
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.mailtrap.io"
+EMAIL_PORT = "2525"
+EMAIL_HOST_USER = "36be8d02b3417a"
+EMAIL_HOST_PASSWORD = "24995b16954584"
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False

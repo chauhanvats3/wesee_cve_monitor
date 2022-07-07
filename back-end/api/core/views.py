@@ -63,7 +63,6 @@ class DomainViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def addNewSubdomain(self, request, pk):
-        print(request.data)
         async_add_new_subdomain.delay(pk, request.data)
         return Response({"status": 200, "message": "Subomain Will Be added for sure"})
 
@@ -80,7 +79,6 @@ class SubdomainViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def findTech(self, request, pk):
-        print("Updatind Techs for : " + self.name)
         subdomainId = pk
         SubdomainModel = apps.get_model(app_label="core", model_name="Subdomain")
         thisSubdomain = SubdomainModel.objects.get(pk=subdomainId)
@@ -93,6 +91,9 @@ class TechViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = TechSerializer
     queryset = Tech.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
     @action(detail=True, methods=["post"])
     def markCVEsSeen(self, request, pk):

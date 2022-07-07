@@ -12,7 +12,12 @@
             <p class="getTech" @click.stop="getSubdomainTechs(subdomain.id)">
               refresh
             </p>
-            <p class="exclude" @click.stop="toggleExclusion(subdomain.name)">
+            <p
+              class="exclude"
+              @click.stop="
+                toggleExclusion(subdomain.name, subdomain.id, subdomain.include)
+              "
+            >
               exclude
             </p>
           </div>
@@ -40,7 +45,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   props: ['domain'],
@@ -49,15 +54,19 @@ export default {
     ...mapGetters('domains', ['getSubdomains']),
   },
   methods: {
-    ...mapMutations({ excludeToggle: 'domains/excludeToggle' }),
-    ...mapActions({ getTechs: 'domains/getSubdomainTechs' }),
+    ...mapActions({
+      getTechs: 'domains/getSubdomainTechs',
+      excludeToggle: 'domains/toggleExclusion',
+    }),
     subPillClicked(info) {
       this.$emit('sub-pill-clicked', info)
     },
-    toggleExclusion(subdomain) {
+    toggleExclusion(name, id, included) {
       let info = {
         domain: this.domain,
-        subdomain,
+        subdomain: name,
+        id: id,
+        include: included,
       }
       this.excludeToggle(info)
     },

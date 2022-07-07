@@ -85,10 +85,6 @@ export const mutations = {
       let domainTechs = domains[i].techs
       for (let j = 0; j < domainTechs.length; j++) {
         if (domainTechs[j].id == tech.id) {
-          console.log('Ho gaya')
-          //domainTechs[j] = tech
-          console.log(state.allDomains[i].techs[j])
-          console.log(tech)
           state.allDomains[i].techs[j] = tech
           state.allDomains[i].techs.push(1)
           state.allDomains[i].techs.pop()
@@ -213,6 +209,20 @@ export const actions = {
 
     context.commit('enumToggle', info.name)
   },
+  async toggleExclusion(context, info) {
+    console.log('Toggle Exclusion')
+    console.log(info)
+    try {
+      await this.$axios.$patch(`/api/subdomains/${info.id}/`, {
+        include: !info.include,
+      })
+    } catch (e) {
+      console.log('Error Occurred')
+      console.log(e)
+    }
+
+    context.commit('excludeToggle', info)
+  },
   async toggleCVESeen(context, techId) {
     try {
       await this.$axios.$post(`/api/techs/${techId}/markCVEsSeen/`)
@@ -220,8 +230,6 @@ export const actions = {
       console.log('Error Occurred')
       console.log(e)
     }
-
-    context.commit('cveSeenToggle', techId)
   },
   async changeCronInterval(context, info) {
     try {

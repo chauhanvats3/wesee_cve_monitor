@@ -85,7 +85,7 @@ export default {
     domainPhoto() {
       if (this.domainInfo.photo != undefined) {
         return this.domainInfo.photo
-      } else return 'https://random.imagecdn.app/550/350'
+      } else return 'https://random.imagecdn.app/v1/image?category=wallpaper'
     },
     totalCVE() {
       let total = 0
@@ -173,6 +173,7 @@ $top-row-height : 60px
     position: relative
     overflow: hidden
     transition: all 0.4s ease-in-out
+    background-size: cover
 
     .overlay
         @include flexify-col
