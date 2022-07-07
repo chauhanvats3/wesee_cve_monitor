@@ -63,10 +63,10 @@ export default {
         enumerate: this.$refs.checkbox.checked,
         verify_code:
           Math.floor(Math.random() * (this.maxNum - this.minNum)) + this.minNum,
-        subdomains: null,
-        techs: null,
         name: domainName.split('://')[1],
         verified: false,
+        subdomains: [],
+        techs: [],
       }
 
       let domains = this.allDomains()

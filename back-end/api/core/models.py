@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from celery import group
 from .utilities import getPhoto
-from .tasks import async_get_domain_data, async_get_subdomain_techs, async_get_tech_cves
+from .tasks import async_get_subdomain_techs, async_get_tech_cves
 
 
 class CVE(models.Model):
@@ -121,4 +121,3 @@ class Domain(models.Model):
             self.photo = photoUrl
             print("Photo Added : " + photoUrl)
         super(Domain, self).save(*args, **kwargs)
-        async_get_domain_data.delay(self.id)

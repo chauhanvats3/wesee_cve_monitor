@@ -19,6 +19,7 @@ from .models import Domain, Subdomain, Tech, CVE
 from .tasks import (
     async_mark_cve_seen,
     async_add_new_subdomain,
+    async_get_domain_data,
 )
 
 

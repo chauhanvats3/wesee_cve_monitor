@@ -12,7 +12,7 @@ class CVESerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class TechSerializer(serializers.ModelSerializer):
+class TechSerializer(WritableNestedModelSerializer, NestedCreateMixin):
     cves = CVESerializer(many=True)
 
     class Meta:
@@ -20,7 +20,7 @@ class TechSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class SubdomainSerializer(serializers.ModelSerializer):
+class SubdomainSerializer(WritableNestedModelSerializer, NestedCreateMixin):
     techs = TechSerializer(many=True)
 
     class Meta:
@@ -28,7 +28,7 @@ class SubdomainSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class DomainSerializer(WritableNestedModelSerializer):
+class DomainSerializer(WritableNestedModelSerializer, NestedCreateMixin):
     name = serializers.ReadOnlyField()
     protocol = serializers.ReadOnlyField()
     subdomains = SubdomainSerializer(many=True)

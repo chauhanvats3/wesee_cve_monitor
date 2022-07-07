@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models.signals import pre_save, post_save, pre_delete
 from django.dispatch import receiver
+
+from .tasks import async_get_domain_data
 from .utilities import getCVEs
 from django_celery_beat.models import PeriodicTask
 from .periodic import periodic_update_domain_CVEs
@@ -50,3 +52,7 @@ def changeCronJob(sender, instance, **kwargs):
 
         else:  # field has not changed
             print("No Need To Change Cron job")
+
+        if not oldDomain.verified == instance.verified:
+            if instance.verified:
+                async_get_domain_data.delay(instance.id)
