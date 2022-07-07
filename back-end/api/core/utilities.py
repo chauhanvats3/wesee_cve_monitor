@@ -3,7 +3,7 @@ import dns.resolver
 from bs4 import BeautifulSoup
 from django.core.mail import send_mail
 
-WAPPALYZER_API_KEY = "y6zvx1SEJC5hx7rjnAvYu6jOqDEntYID91PGAlND"
+WAPPALYZER_API_KEY = "lLq4MEgKsNPOtFWSHxJK1GjP6OLGcWe2bI820nA8"
 UNSPLASH_API_KEY = "mjxmWdfEkErf3EYA66iggKKsgywYcrsy5P7ABqJ5-hE"
 NVD_API_KEY = "09287fcf-8c39-4531-a50e-0a5132cb4664"
 

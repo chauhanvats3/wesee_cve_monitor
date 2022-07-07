@@ -102,6 +102,7 @@ class Domain(models.Model):
     author = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
     saved_already = models.BooleanField(default=False)
     cron_interval = models.PositiveSmallIntegerField(default=2)
+    fetching_subdomains = models.BooleanField(default=True)
 
     @property
     def name(self):

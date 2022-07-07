@@ -1,5 +1,5 @@
 <template>
-  <div class="fetching">
+  <div class="fetching" :style="{ height: height }">
     <svg
       version="1.1"
       id="L7"
@@ -57,19 +57,27 @@
         ></animateTransform>
       </path>
     </svg>
-    <p>Fetching Domains...</p>
+    <p>Fetching {{ name }}...</p>
   </div>
 </template>
 
 <script>
-export default {}
+export default {
+  props: {
+    name: {
+      default: 'Domains',
+    },
+    height: {
+      default: '85vh',
+    },
+  },
+}
 </script>
 
 <style lang="sass" scoped>
 .fetching
     @include flexify-row
     width: 98vw
-    height: 85vh
 
     svg
         width: 70px

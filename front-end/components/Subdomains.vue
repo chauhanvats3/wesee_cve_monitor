@@ -36,7 +36,7 @@
           v-else-if="!subdomain.techs_fetched"
           class="tech_not_found finding"
         >
-          Fetching Technologies
+          <Fetching name="Technologies" height="10vh" />
         </div>
         <div v-else class="tech_not_found"><p>No Technologies Found</p></div>
       </div>
@@ -46,10 +46,10 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import Fetching from './Fetching.vue'
 
 export default {
   props: ['domain'],
-
   computed: {
     ...mapGetters('domains', ['getSubdomains']),
   },
@@ -74,6 +74,7 @@ export default {
       this.getTechs(id)
     },
   },
+  components: { Fetching },
 }
 </script>
 

@@ -76,6 +76,9 @@
           </div>
         </div>
       </div>
+      <div class="fetching-subdomains" v-if="thisDomain.fetching_subdomains">
+        <Fetching name="Subdomains" height="10vh" />
+      </div>
       <Subdomains
         v-if="enumerate"
         :domain="slug"
@@ -88,10 +91,10 @@
 
 <script>
 import { mapGetters, mapActions, mapMutations } from 'vuex'
+import Fetching from '~/components/Fetching.vue'
 
 export default {
   middleware: 'auth',
-
   data() {
     return {
       techToOpen: {},
@@ -105,7 +108,6 @@ export default {
     const slug = context.params.slug
     return { slug }
   },
-
   computed: {
     ...mapGetters({
       domains: 'domains/getAllDomains',
@@ -188,6 +190,7 @@ export default {
     if (storedDomains.length == 0) await this.getDomainsFromBackend()
   },
   fetchOnServer: false,
+  components: { Fetching },
 }
 </script>
 

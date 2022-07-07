@@ -1,5 +1,6 @@
 import random
 from socket import timeout
+import sys
 import time
 from celery import shared_task, group
 from .utilities import getTechs, getCVEs, findSubdomains, sendCVEmail
@@ -51,11 +52,30 @@ def async_create_subdomain_techs(subdomainId, techName, localVersions):
 def saveSubdomains(thisDomain):
     subdomainsResponse = findSubdomains(thisDomain.name)
     try:
-        for subdomain in subdomainsResponse:
-            time.sleep(6)
-            async_create_subdomains.delay(thisDomain.id, subdomain)
-            print("Subdomains saved for : " + thisDomain.name)
-    except:
+        time.sleep(6)
+        subdomain_create_group = group(
+            [
+                async_create_subdomains.s(thisDomain.id, subdomain)
+                for subdomain in subdomainsResponse
+            ]
+        )
+        print("Group Created")
+        group_job = subdomain_create_group.apply_async()
+        finished = False
+        print("Group Running")
+        while not finished:
+            finished = group_job.ready()
+
+        print("Group Finished")
+
+        thisDomain.fetching_subdomains = False
+        thisDomain.save(update_fields=["fetching_subdomains"])
+
+        print("Subdomains fetched for : " + thisDomain.name)
+    except AttributeError as err:
+        print(err)
+        thisDomain.fetching_subdomains = False
+        thisDomain.save(update_fields=["fetching_subdomains"])
         print("Subdomains Not Found")
 
 
@@ -65,7 +85,7 @@ def saveTechs(thisDomain):
         for tech in techResponse[0]["technologies"]:
             techName = tech["name"]
             versions = tech["versions"]
-            time.sleep(3)
+            time.sleep(6)
             async_create_domain_tech.delay(thisDomain.id, techName, versions)
             print("Saved Domain Techs : " + thisDomain.name)
 
