@@ -37,7 +37,7 @@ export default {
 
       try {
         console.log(this.userData)
-        for (property in this.userData) {
+        for (let property in this.userData) {
           property = property.trim()
         }
         let res = await this.registerUserOnBackend(this.userData)

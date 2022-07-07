@@ -63,8 +63,8 @@ export default {
         enumerate: this.$refs.checkbox.checked,
         verify_code:
           Math.floor(Math.random() * (this.maxNum - this.minNum)) + this.minNum,
-        subdomains: [],
-        techs: [],
+        subdomains: null,
+        techs: null,
         name: domainName.split('://')[1],
         verified: false,
       }

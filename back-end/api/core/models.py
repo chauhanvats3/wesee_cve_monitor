@@ -21,7 +21,17 @@ class CVE(models.Model):
     isSeen = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.cve_id
+        tech = list(self.techno.all())[0]
+        if tech.subdomain_set.count() != 0:
+            subdomain = list(tech.subdomain_set.all())[0]
+            domain = list(subdomain.domain_set.all())[0]
+            return f"{domain.name} : {subdomain.name} : {tech.name} : {self.cve_id}"
+
+        elif tech.domain_set.count() != 0:
+            domain = list(tech.domain_set.all())[0]
+            return f"{domain.name} : {tech.name} : {self.cve_id}"
+        else:
+            return f"{self.cve_id}"
 
     def save(self, *args, **kwargs):
         super(CVE, self).save(*args, **kwargs)
@@ -47,7 +57,16 @@ class Tech(models.Model):
     author = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "%s " % (self.name)
+        if self.domain_set.count() != 0:
+            domain = list(self.domain_set.all())[0]
+            return f"{domain.name} :  {self.name}"
+
+        elif self.subdomain_set.count() != 0:
+            subdomain = list(self.subdomain_set.all())[0]
+            domain = list(subdomain.domain_set.all())[0]
+            return f"{domain.name} : {subdomain.name} : {self.name}"
+        else:
+            return f"{self.name}"
 
     def save(self, *args, **kwargs):
         super(Tech, self).save(*args, **kwargs)

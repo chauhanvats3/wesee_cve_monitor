@@ -31,9 +31,14 @@ class DomainViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def get_queryset(self):
-        queryset = self.queryset
-        query_set = queryset.filter(author=self.request.user)
-        return query_set
+        query_set = self.queryset.filter(author=self.request.user)
+        verified = query_set.filter(verified=True).defer("author")
+        unverified = (
+            query_set.filter(verified=False)
+            .only("full_name", "verified", "verify_code", "photo", "author")
+            .defer("author")
+        )
+        return verified | unverified
 
     @action(detail=True, methods=["post"])
     def verify(self, request, pk):
@@ -79,9 +84,8 @@ class SubdomainViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def findTech(self, request, pk):
-        subdomainId = pk
         SubdomainModel = apps.get_model(app_label="core", model_name="Subdomain")
-        thisSubdomain = SubdomainModel.objects.get(pk=subdomainId)
+        thisSubdomain = SubdomainModel.objects.get(pk=pk)
         thisSubdomain.techs_fetched = False
         thisSubdomain.save()
         return Response("Updating Subdomain Techs")
@@ -94,6 +98,10 @@ class TechViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get_queryset(self):
+        print(type(self))
+        return self.queryset.filter(author=self.request.user).defer("author")
 
     @action(detail=True, methods=["post"])
     def markCVEsSeen(self, request, pk):

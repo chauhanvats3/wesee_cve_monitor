@@ -42,7 +42,7 @@ def changeCronJob(sender, instance, **kwargs):
     else:
         if not oldDomain.cron_interval == instance.cron_interval:  # Field has changed
             print("Changing Cron Job")
-            taskQuery = "Updating " + str(instance.id) + " CVEs"
+            taskQuery = f"Updating {str(instance.id)} : {instance.name}  CVEs"
             periodicTasks = PeriodicTask.objects.filter(name=taskQuery)
             for task in periodicTasks:
                 task.delete()

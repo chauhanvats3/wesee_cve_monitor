@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from drf_writable_nested.serializers import WritableNestedModelSerializer
-from drf_writable_nested import UniqueFieldsMixin, NestedUpdateMixin
+from drf_writable_nested import UniqueFieldsMixin, NestedUpdateMixin, NestedCreateMixin
 
 
 from .models import Domain, Subdomain, Tech, CVE
@@ -10,28 +10,25 @@ class CVESerializer(serializers.ModelSerializer):
     class Meta:
         model = CVE
         fields = "__all__"
-        depth = 1
 
 
-class TechSerializer(UniqueFieldsMixin, WritableNestedModelSerializer):
+class TechSerializer(serializers.ModelSerializer):
     cves = CVESerializer(many=True)
 
     class Meta:
         model = Tech
         fields = "__all__"
-        depth = 3
 
 
-class SubdomainSerializer(UniqueFieldsMixin, WritableNestedModelSerializer):
+class SubdomainSerializer(serializers.ModelSerializer):
     techs = TechSerializer(many=True)
 
     class Meta:
         model = Subdomain
         fields = "__all__"
-        depth = 3
 
 
-class DomainSerializer(UniqueFieldsMixin, WritableNestedModelSerializer):
+class DomainSerializer(WritableNestedModelSerializer):
     name = serializers.ReadOnlyField()
     protocol = serializers.ReadOnlyField()
     subdomains = SubdomainSerializer(many=True)
@@ -43,5 +40,4 @@ class DomainSerializer(UniqueFieldsMixin, WritableNestedModelSerializer):
     class Meta:
         model = Domain
         fields = "__all__"
-        depth = 5
         read_only_fields = ["author"]

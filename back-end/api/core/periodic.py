@@ -28,7 +28,7 @@ scheduleTwelveHours, createdTwelveHours = IntervalSchedule.objects.get_or_create
 )
 
 
-def periodic_update_domain_CVEs(domainId, time):
+def periodic_update_domain_CVEs(domainId, time, domainName):
     newInterval = None
     if time == 2:
         newInterval = scheduleTwoHours
@@ -43,7 +43,7 @@ def periodic_update_domain_CVEs(domainId, time):
     elif time == 12:
         newInterval = scheduleTwelveHours
 
-    taskName = "Updating " + str(domainId) + " CVEs"
+    taskName = f"Updating {str(domainId)} : {domainName}  CVEs"
 
     PeriodicTask.objects.create(
         interval=newInterval,

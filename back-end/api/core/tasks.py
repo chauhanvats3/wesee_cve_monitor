@@ -88,7 +88,7 @@ def async_get_domain_data(domainId):
         print("Getting Subdomains : " + thisDomain.name)
         saveSubdomains(thisDomain)
 
-        periodic_update_domain_CVEs(domainId, thisDomain.cron_interval)
+        periodic_update_domain_CVEs(domainId, thisDomain.cron_interval, thisDomain.name)
 
         print("Data Set Async completed")
     else:
