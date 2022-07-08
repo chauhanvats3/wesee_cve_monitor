@@ -123,13 +123,14 @@ export const actions = {
   async addDomainToBackend(context, domainInfo) {
     let errors = []
     try {
-      context.commit('addDomain', domainInfo)
       let info = await this.$axios.$post('/api/domains/', domainInfo)
       domainInfo = info
-      context.commit('updateDomain', domainInfo)
     } catch (error) {
-      return error
+      console.log(error)
+      throw error
     }
+    context.commit('addDomain', domainInfo)
+    console.log(domainInfo)
 
     if (errors.length > 0) return errors
     return 200

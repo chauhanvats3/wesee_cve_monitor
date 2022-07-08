@@ -11,12 +11,12 @@ class CVE(models.Model):
     def json_default():
         return {"arr": []}
 
-    description = models.TextField(blank=True)
-    severity = models.CharField(max_length=20)
-    score = models.CharField(max_length=5)
+    description = models.TextField(blank=True, editable=False)
+    severity = models.CharField(max_length=20, editable=False)
+    score = models.CharField(max_length=5, editable=False)
     references = models.JSONField(default=json_default)
     tech_id = models.CharField(max_length=10)
-    cve_id = models.CharField(max_length=50, default="")
+    cve_id = models.CharField(max_length=50, default="", editable=False)
     isNew = models.BooleanField(default=True)
     isSeen = models.BooleanField(default=False)
 
@@ -49,12 +49,14 @@ class Tech(models.Model):
     def json_default():
         return {"arr": []}
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, editable=False)
     versions = models.JSONField(default=json_default)
     cves = models.ManyToManyField(CVE, blank=True, related_name="techno")
-    color = models.CharField(max_length=6, default="828192")
+    color = models.CharField(max_length=6, default="828192", editable=False)
     updating_cve = models.BooleanField(default=True)
-    author = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        get_user_model(), null=True, on_delete=models.CASCADE, editable=False
+    )
 
     def __str__(self):
         if self.domain_set.count() != 0:
@@ -74,7 +76,7 @@ class Tech(models.Model):
 
 
 class Subdomain(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, editable=False)
     include = models.BooleanField(default=True)
     techs = models.ManyToManyField(Tech)
     techs_fetched = models.BooleanField(default=False)
@@ -92,14 +94,16 @@ class Subdomain(models.Model):
 
 
 class Domain(models.Model):
-    full_name = models.URLField(unique=True)
+    full_name = models.URLField(unique=True, editable=False)
     verified = models.BooleanField(default=False)
     enumerate = models.BooleanField(default=False)
     subdomains = models.ManyToManyField(Subdomain, blank=True)
     techs = models.ManyToManyField(Tech, blank=True)
-    verify_code = models.PositiveIntegerField()
-    photo = models.CharField(max_length=550, blank=True)
-    author = models.ForeignKey(get_user_model(), null=True, on_delete=models.CASCADE)
+    verify_code = models.PositiveIntegerField(editable=False)
+    photo = models.CharField(max_length=550, blank=True, editable=False)
+    author = models.ForeignKey(
+        get_user_model(), null=True, on_delete=models.CASCADE, editable=False
+    )
     saved_already = models.BooleanField(default=False)
     cron_interval = models.PositiveSmallIntegerField(default=2)
     fetching_subdomains = models.BooleanField(default=True)

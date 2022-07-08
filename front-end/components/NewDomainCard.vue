@@ -8,6 +8,9 @@
     </div>
 
     <div class="overlay" ref="overlay">
+      <div class="error">
+        <p ref="error"></p>
+      </div>
       <div class="close" @click.stop="closeOverlay">
         <p>X</p>
       </div>
@@ -22,7 +25,7 @@
         <input type="checkbox" class="chckbx" ref="checkbox" />
         <p @click="checkBoxClick">Subdomain Enumeration</p>
       </div>
-      <div class="add" @click.stop="addNewDomain">
+      <div class="add" @click.stop="addNewDomain" ref="btn">
         <p>Add Domain</p>
       </div>
     </div>
@@ -53,11 +56,22 @@ export default {
     checkBoxClick() {
       this.$refs.checkbox.checked = !this.$refs.checkbox.checked
     },
+    showError(err) {
+      this.$refs.error.innerHTML = 'Error : ' + err
+    },
     addNewDomain() {
       let domainName = this.$refs.domainInput.value
       if (domainName.indexOf('www.') != -1)
         domainName = domainName.split('www.')[1]
       if (!domainName.startsWith('https')) domainName = 'https://' + domainName
+      var isValidURL = domainName.match(
+        /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
+      )
+      if (!isValidURL) {
+        this.showError('Not a valid domain!')
+        return
+      }
+
       let domainInfo = {
         full_name: domainName,
         enumerate: this.$refs.checkbox.checked,
@@ -73,11 +87,19 @@ export default {
       for (let i = 0; i < domains.length; i++) {
         if (domains[i].full_name == domainInfo.full_name) {
           console.log('Domain Exists')
+          this.showError('Domain Already Exists')
           return
         }
       }
 
-      let status = this.domainToServer(domainInfo)
+      this.domainToServer(domainInfo)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((err) => {
+          this.showError('This Domain Already Exists')
+          console.error(err)
+        })
       this.$refs.domainInput.value = ''
     },
   },
@@ -152,6 +174,16 @@ export default {
             border-radius: 5px
             cursor: pointer
             font-size: 0.7rem
+
+        .error
+            position: absolute
+            left: 0
+            top: 0
+            color: $red
+            margin: 10px
+            padding: 10px
+            font-size: 0.7rem
+
 
         .txtbx
             border: 0

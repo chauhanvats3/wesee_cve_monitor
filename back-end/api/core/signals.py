@@ -17,7 +17,7 @@ def cascadeDeleteDomain(sender, instance, **kwargs):
         subdomain.delete()
     for tech in instance.techs.all():
         tech.delete()
-    taskQuery = "Updating " + str(instance.id) + " CVEs"
+    taskQuery = f"Updating {str(instance.id)} : {instance.name}  CVEs"
     periodicTasks = PeriodicTask.objects.filter(name=taskQuery)
     for task in periodicTasks:
         task.delete()

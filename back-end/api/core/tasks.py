@@ -97,7 +97,7 @@ def saveTechs(thisDomain):
 def async_get_domain_data(domainId):
     domainModel = apps.get_model(app_label="core", model_name="Domain")
     thisDomain = domainModel.objects.get(pk=domainId)
-    if thisDomain.saved_already == False:
+    if thisDomain.saved_already == False and thisDomain.verified:
 
         thisDomain.saved_already = True
         thisDomain.save(update_fields=["saved_already"])
@@ -154,41 +154,44 @@ def async_update_domain_cve(*args):
     domainId = args[0]
     domainModel = apps.get_model(app_label="core", model_name="Domain")
     thisDomain = domainModel.objects.get(pk=domainId)
-    print("Updating CVEs for : " + thisDomain.name)
-    update_tasks = []
-    newCVEsIn = []
-    for tech in thisDomain.techs.all():
-        update_tasks.append(
-            {
-                "id": tech.id,
-                "name": tech.name,
-                "domain": thisDomain.name,
-                "subdomain": False,
-            }
-        )
-    for subdomain in thisDomain.subdomains.all():
-        for tech in subdomain.techs.all():
+    if thisDomain.verified:
+        print("Updating CVEs for : " + thisDomain.name)
+        update_tasks = []
+        newCVEsIn = []
+        for tech in thisDomain.techs.all():
             update_tasks.append(
                 {
                     "id": tech.id,
                     "name": tech.name,
                     "domain": thisDomain.name,
-                    "subdomain": subdomain.name,
+                    "subdomain": False,
                 }
             )
-    update_group = group(
-        [async_get_tech_cves.s(tech["id"], True) for tech in update_tasks]
-    )
-    update_job = update_group.apply_async()
-    finished = False
-    while not finished:
-        finished = update_job.ready()
-    update_res = update_job.get()
-    for index, tech in enumerate(update_tasks):
-        if update_res[index]:
-            newCVEsIn.append(update_tasks[index])
-    print("New CVEs were found")
-    async_compose_cve_mail.delay(newCVEsIn)
+        for subdomain in thisDomain.subdomains.all():
+            for tech in subdomain.techs.all():
+                update_tasks.append(
+                    {
+                        "id": tech.id,
+                        "name": tech.name,
+                        "domain": thisDomain.name,
+                        "subdomain": subdomain.name,
+                    }
+                )
+        update_group = group(
+            [async_get_tech_cves.s(tech["id"], True) for tech in update_tasks]
+        )
+        update_job = update_group.apply_async()
+        finished = False
+        while not finished:
+            finished = update_job.ready()
+        update_res = update_job.get()
+        for index, tech in enumerate(update_tasks):
+            if update_res[index]:
+                newCVEsIn.append(update_tasks[index])
+        print("New CVEs were found")
+        async_compose_cve_mail.delay(newCVEsIn)
+    else:
+        print(f"{thisDomain.name} is not verified")
 
 
 @shared_task
